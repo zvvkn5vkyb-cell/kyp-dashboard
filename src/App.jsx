@@ -223,6 +223,12 @@ const factors = [
   },
 ];
 
+const STRUCTURE_SENSITIVE = new Set([
+  "Liquidity", "Concentration", "Time Horizon", "Asset Class",
+  "Leverage Actual", "Development", "Return Variability", "Leverage OM",
+  "Interest Rate", "VaR", "Derivatives Actual", "Derivatives OM",
+]);
+
 // Equiton brand palette
 const EQ = {
   navy:       "#2e3a55",
@@ -491,6 +497,7 @@ function Toggle({ on, onChange }) {
 
 export default function App() {
   const [scores,       setScores]      = useState(Object.fromEntries(factors.map(f => [f.name, 3])));
+  const [debtScores,   setDebtScores]  = useState(Object.fromEntries(factors.map(f => [f.name, null])));
   const [enabled,      setEnabled]     = useState(Object.fromEntries(factors.map(f => [f.name, true])));
   const [reasons,      setReasons]     = useState(Object.fromEntries(factors.map(f => [f.name, ""])));
   const [fund,         setFund]        = useState("");
@@ -515,6 +522,7 @@ export default function App() {
 
   const handleReset = () => {
     setScores(Object.fromEntries(factors.map(f => [f.name, 3])));
+    setDebtScores(Object.fromEntries(factors.map(f => [f.name, null])));
     setEnabled(Object.fromEntries(factors.map(f => [f.name, true])));
     setReasons(Object.fromEntries(factors.map(f => [f.name, ""])));
     setFund("");
@@ -546,24 +554,43 @@ export default function App() {
 
   const setReason = (name, text) => setReasons(prev => ({ ...prev, [name]: text }));
 
-  // Active weight sum — used to redistribute disabled factors' weights
+  const isHybridSS = (name) => fundType === "Hybrid" && STRUCTURE_SENSITIVE.has(name);
+
+  // Active weight sum — excludes disabled factors and incomplete hybrid dual-score factors
   const activeWeightSum = useMemo(
-    () => factors.filter(f => enabled[f.name]).reduce((s, f) => s + f.weight, 0),
-    [enabled]
+    () => factors.filter(f => {
+      if (!enabled[f.name]) return false;
+      if (isHybridSS(f.name) && debtScores[f.name] == null) return false;
+      return true;
+    }).reduce((s, f) => s + f.weight, 0),
+    [enabled, fundType, debtScores]
   );
 
   const contribs = useMemo(() => factors.map(f => {
     const isOn = enabled[f.name];
-    // Effective weight: proportionally scaled up when others are disabled
-    const effectiveWeight = isOn && activeWeightSum > 0 ? f.weight / activeWeightSum : 0;
+    const needsDual = isHybridSS(f.name);
+    const dScore = debtScores[f.name];
+    const isComplete = !needsDual || dScore != null;
+    const canContribute = isOn && isComplete;
+
+    const blendedScore = needsDual && dScore != null
+      ? scores[f.name] * (hybridSplit / 100) + dScore * ((100 - hybridSplit) / 100)
+      : scores[f.name];
+
+    const effectiveWeight = canContribute && activeWeightSum > 0 ? f.weight / activeWeightSum : 0;
+
     return {
       ...f,
       isOn,
+      isComplete,
+      needsDual,
       score: scores[f.name],
+      debtScore: dScore,
+      blendedScore,
       effectiveWeight,
-      contrib: isOn ? scores[f.name] * effectiveWeight : 0,
+      contrib: canContribute ? blendedScore * effectiveWeight : 0,
     };
-  }), [scores, enabled, activeWeightSum]);
+  }), [scores, debtScores, enabled, fundType, hybridSplit, activeWeightSum]);
 
   const CRS     = useMemo(() => contribs.reduce((s, f) => s + f.contrib, 0), [contribs]);
   const activeContribs = useMemo(() => contribs.filter(f => f.isOn), [contribs]);
@@ -916,6 +943,46 @@ export default function App() {
               ))}
             </div>
           </div>
+
+          {/* Score Breakdown */}
+          <div style={{ marginTop: 16, background: EQ.white, borderRadius: 6, border: `1px solid ${EQ.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
+            <div style={{ background: EQ.navy, padding: "8px 14px" }}>
+              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: EQ.gold, fontWeight: 700 }}>Score Breakdown</span>
+            </div>
+            <div style={{ padding: "10px 14px 6px" }}>
+              <div style={{ fontSize: 10, color: EQ.textMuted, fontStyle: "italic", marginBottom: 8 }}>Weights reflect active factors only and sum to 100%.</div>
+              {/* Header row */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 42px 42px", gap: 4, paddingBottom: 6, borderBottom: `1px solid ${EQ.border}`, marginBottom: 4 }}>
+                <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: EQ.textMuted }}>Factor</span>
+                <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: EQ.textMuted, textAlign: "right" }}>Eff. Wt</span>
+                <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", color: EQ.textMuted, textAlign: "right" }}>Wtd</span>
+              </div>
+              {/* Factor rows */}
+              {contribs.map((f, i) => (
+                <div key={f.name} style={{ padding: "4px 0", borderBottom: i < contribs.length - 1 ? `1px solid ${EQ.border}88` : "none", opacity: f.isOn ? 1 : 0.38 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 42px 42px", gap: 4 }}>
+                    <span style={{ fontSize: 10, color: EQ.navy, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{f.displayName}</span>
+                    <span style={{ fontSize: 10, color: EQ.textMuted, textAlign: "right", fontFamily: "monospace" }}>{f.isOn && f.isComplete ? (f.effectiveWeight * 100).toFixed(1) + "%" : "—"}</span>
+                    <span style={{ fontSize: 10, color: f.isOn && !f.isComplete ? "#c05000" : EQ.navy, textAlign: "right", fontFamily: "monospace" }}>{f.isOn && f.isComplete ? f.contrib.toFixed(3) : f.isOn && !f.isComplete ? "incmpl" : "—"}</span>
+                  </div>
+                  {f.needsDual && f.isOn && (
+                    <div style={{ fontSize: 9, color: EQ.textMuted, fontFamily: "monospace", marginTop: 1 }}>
+                      E:{f.score} / D:{f.debtScore ?? "?"}
+                    </div>
+                  )}
+                </div>
+              ))}
+              {/* Total row */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 42px 42px", gap: 4, paddingTop: 7, marginTop: 3, borderTop: `2px solid ${EQ.navy}` }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: EQ.navy }}>Total</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: EQ.navy, textAlign: "right", fontFamily: "monospace" }}>—</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: EQ.navy, textAlign: "right", fontFamily: "monospace" }}>{CRS.toFixed(3)}</span>
+              </div>
+              {fundType === "Hybrid" && (
+                <div style={{ marginTop: 8, fontSize: 9, color: EQ.textMuted, fontStyle: "italic" }}>* Blended score (Eq × {hybridSplit}% + Dt × {100 - hybridSplit}%)</div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* ── Right Panel ── */}
@@ -1175,8 +1242,8 @@ export default function App() {
             )}
 
             {contribs.map((f, idx) => {
-              const barPct = f.isOn ? (f.contrib / maxC) * 100 : 0;
-              const barColor = f.score >= 4 ? "#c05000" : f.score >= 3 ? "#b08000" : "#2a7d4f";
+              const barPct = f.isOn && f.isComplete ? (f.contrib / maxC) * 100 : 0;
+              const barColor = f.blendedScore >= 4 ? "#c05000" : f.blendedScore >= 3 ? "#b08000" : "#2a7d4f";
               const isOpen = openCriteria.has(f.name);
               const weightChanged = f.isOn && Math.abs(f.effectiveWeight - f.weight) > 0.0001;
               const reason = reasons[f.name];
@@ -1226,8 +1293,8 @@ export default function App() {
                       <div style={{ position: "relative", height: 5, background: EQ.surface, borderRadius: 3 }}>
                         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${barPct}%`, background: f.isOn ? EQ.gold : "#c8ccd8", borderRadius: 3, transition: "width .25s ease" }} />
                       </div>
-                      <div style={{ fontSize: 9, color: EQ.textMuted, marginTop: 2, fontFamily: "sans-serif", textAlign: "right" }}>
-                        {f.isOn ? f.contrib.toFixed(3) : "—"}
+                      <div style={{ fontSize: 9, color: f.isOn && !f.isComplete ? "#c05000" : EQ.textMuted, marginTop: 2, fontFamily: "sans-serif", textAlign: "right" }}>
+                        {f.isOn && f.isComplete ? f.contrib.toFixed(3) : f.isOn && !f.isComplete ? "incomplete" : "—"}
                       </div>
                     </div>
 
@@ -1242,35 +1309,61 @@ export default function App() {
 
                   {/* ── Score Buttons (disabled when off) ── */}
                   {f.isOn && (
-                    <div style={{ padding: "8px 12px 6px", display: "flex", gap: 4, flexWrap: "wrap" }}>
-                      {[1, 2, 3, 4, 5].map(v => {
-                        const tc = TIER_COLORS[v];
-                        const isSelected = f.score === v;
-                        return (
-                          <button
-                            key={v}
-                            onClick={() => setScores(prev => ({ ...prev, [f.name]: v }))}
-                            style={{
-                              flex: 1,
-                              minWidth: 60,
-                              padding: "5px 4px",
-                              fontSize: 11,
-                              fontFamily: "sans-serif",
-                              cursor: "pointer",
-                              border: isSelected ? `2px solid ${tc.color}` : `1px solid ${EQ.border}`,
-                              borderRadius: 4,
-                              background: isSelected ? tc.bg : EQ.white,
-                              color: isSelected ? tc.color : EQ.textMuted,
-                              fontWeight: isSelected ? 700 : 400,
-                              transition: "all .15s ease",
-                              whiteSpace: "nowrap",
-                              textAlign: "center",
-                            }}
-                          >
-                            {v} — {tc.label}
-                          </button>
-                        );
-                      })}
+                    <div style={{ padding: "8px 12px 6px" }}>
+                      {f.needsDual ? (
+                        <>
+                          {/* Equity row */}
+                          <div style={{ marginBottom: 6 }}>
+                            <div style={{ fontSize: 9, fontWeight: 700, color: EQ.navy, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>
+                              Equity Component ({hybridSplit}%)
+                            </div>
+                            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                              {[1, 2, 3, 4, 5].map(v => {
+                                const tc = TIER_COLORS[v];
+                                const isSelected = f.score === v;
+                                return (
+                                  <button key={v} onClick={() => setScores(prev => ({ ...prev, [f.name]: v }))}
+                                    style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : `1px solid ${EQ.border}`, borderRadius: 4, background: isSelected ? tc.bg : EQ.white, color: isSelected ? tc.color : EQ.textMuted, fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
+                                    {v} — {tc.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                          {/* Debt row */}
+                          <div>
+                            <div style={{ fontSize: 9, fontWeight: 700, color: EQ.navy, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
+                              Debt Component ({100 - hybridSplit}%)
+                              {f.debtScore == null && <span style={{ fontSize: 9, color: "#c05000", fontWeight: 600 }}>— score required to include this factor</span>}
+                            </div>
+                            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                              {[1, 2, 3, 4, 5].map(v => {
+                                const tc = TIER_COLORS[v];
+                                const isSelected = f.debtScore === v;
+                                return (
+                                  <button key={v} onClick={() => setDebtScores(prev => ({ ...prev, [f.name]: v }))}
+                                    style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : `1px solid ${EQ.border}`, borderRadius: 4, background: isSelected ? tc.bg : EQ.white, color: isSelected ? tc.color : EQ.textMuted, fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
+                                    {v} — {tc.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                          {[1, 2, 3, 4, 5].map(v => {
+                            const tc = TIER_COLORS[v];
+                            const isSelected = f.score === v;
+                            return (
+                              <button key={v} onClick={() => setScores(prev => ({ ...prev, [f.name]: v }))}
+                                style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : `1px solid ${EQ.border}`, borderRadius: 4, background: isSelected ? tc.bg : EQ.white, color: isSelected ? tc.color : EQ.textMuted, fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
+                                {v} — {tc.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   )}
 
