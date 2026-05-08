@@ -828,17 +828,14 @@ export default function App() {
     <div style={{ fontFamily: "'Inter','Helvetica Neue',Arial,sans-serif", background: EQ.surface, minHeight: "100vh", color: "#1a1a1a" }}>
 
       {/* ── Header ── */}
-      <div style={{ background: EQ.navy, padding: "0 32px" }}>
+      <div style={{ background: "#1e3a5f", padding: "0 32px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, borderBottom: `3px solid ${EQ.gold}`, paddingBottom: 0 }}>
           <div style={{ padding: "18px 0 14px" }}>
-            <div style={{ fontSize: 10, letterSpacing: ".18em", color: EQ.gold, textTransform: "uppercase", marginBottom: 5, fontWeight: 700 }}>
-              Equiton Capital — KYP Risk Assessment
+            <div style={{ fontSize: 21, fontWeight: 700, color: "#ffffff" }}>
+              Private Real Estate Fund — Composite Risk Score Model
             </div>
-            <div style={{ fontSize: 21, fontWeight: 700, color: "#ffffff", minHeight: 32 }}>
-              {fund || <span style={{ color: "#7a8099", fontStyle: "italic", fontWeight: 400, fontSize: 16 }}>Enter fund name below →</span>}
-            </div>
-            <div style={{ fontSize: 10, color: EQ.gold, marginTop: 3, opacity: 0.7 }}>
-              {fundType} Fund
+            <div style={{ fontSize: 13, color: "#ffffff", marginTop: 4, opacity: 0.85 }}>
+              20-Factor KYP Assessment Framework Version 4.0
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 24, padding: "18px 0 14px" }}>
