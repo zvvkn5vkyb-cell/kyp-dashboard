@@ -918,7 +918,7 @@ export default function App() {
           {/* Top Risk Drivers */}
           <div style={{ marginTop: 16, background: EQ.white, borderRadius: 6, border: `1px solid ${EQ.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
             <div style={{ background: EQ.navy, padding: "8px 14px" }}>
-              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Top Risk Drivers</span>
+              <span style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Top Risk Drivers</span>
             </div>
             <div style={{ padding: "12px 14px" }}>
               {top5.map((f, i) => (
@@ -934,7 +934,7 @@ export default function App() {
           {/* Risk Tier Reference */}
           <div style={{ marginTop: 16, background: EQ.white, borderRadius: 6, border: `1px solid ${EQ.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
             <div style={{ background: EQ.navy, padding: "8px 14px" }}>
-              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Risk Tier Reference</span>
+              <span style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Risk Tier Reference</span>
             </div>
             <div style={{ padding: "12px 14px" }}>
               {[
@@ -1033,7 +1033,7 @@ export default function App() {
           <div style={{ background: EQ.white, borderRadius: 6, border: `1px solid ${EQ.border}`, marginBottom: 16, overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
             <div style={{ background: EQ.navy, padding: "8px 16px", display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 13 }}>🏢</span>
-              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Fund Details</span>
+              <span style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Fund Details</span>
             </div>
             <div style={{ padding: "16px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, alignItems: "start" }}>
@@ -1264,7 +1264,7 @@ export default function App() {
 
           {/* Section label bar */}
           <div style={{ background: EQ.navy, borderRadius: "6px 6px 0 0", padding: "9px 16px", marginBottom: 0 }}>
-            <span style={{ fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>
+            <span style={{ fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>
               Factor Scoring — 1 (Low Risk) to 5 (High Risk)
             </span>
           </div>
