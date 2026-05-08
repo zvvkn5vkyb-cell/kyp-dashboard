@@ -511,6 +511,7 @@ export default function App() {
   const [fundType,     setFundType]    = useState("Equity");
   const [hybridSplit,  setHybridSplit] = useState(65); // equity %
   const [openCriteria, setOpenCriteria] = useState(new Set());
+  const [collapsedGroups, setCollapsedGroups] = useState(new Set());
 
   // Factors that auto-exclude by fund type (with pre-set reasons)
   const FUND_TYPE_EXCLUSIONS = {
@@ -536,6 +537,7 @@ export default function App() {
     setFundType("Equity");
     setHybridSplit(65);
     setOpenCriteria(new Set());
+    setCollapsedGroups(new Set());
   };
 
   const toggleCriteria = (name) => {
@@ -1182,6 +1184,10 @@ export default function App() {
               setReasons(newReasons);
             };
 
+            const allGroupLabels = FACTOR_GROUPS.flatMap(col => col.groups.map(g => g.label));
+            const expandAll  = () => setCollapsedGroups(new Set());
+            const collapseAll = () => setCollapsedGroups(new Set(allGroupLabels));
+
             const toggleGroup = (groupFactors, targetState) => {
               setEnabled(prev => ({ ...prev, ...Object.fromEntries(groupFactors.map(n => [n, targetState])) }));
               if (!targetState) {
@@ -1202,7 +1208,14 @@ export default function App() {
                     <span style={{ fontSize: 16 }}>⚙</span>
                     <span style={{ fontSize: 16, fontWeight: 700, color: EQ.navy }}>Risk Factor Configuration</span>
                   </div>
-                  <div style={{ display: "flex", gap: 8 }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <button onClick={expandAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: `1px solid ${EQ.borderDark}`, borderRadius: 4, background: "#fff", color: EQ.navy }}>
+                      Expand All
+                    </button>
+                    <button onClick={collapseAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: `1px solid ${EQ.borderDark}`, borderRadius: 4, background: "#fff", color: EQ.navy }}>
+                      Collapse All
+                    </button>
+                    <div style={{ width: 1, height: 20, background: EQ.border }} />
                     <button onClick={enableAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: `1px solid #2a7d4f`, borderRadius: 4, background: "#fff", color: "#2a7d4f" }}>
                       Enable All
                     </button>
@@ -1230,17 +1243,29 @@ export default function App() {
                         return (
                           <div key={gi} style={{ marginBottom: gi < col.groups.length - 1 ? 16 : 0 }}>
                             {/* Group header */}
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e3a5f", textTransform: "uppercase", letterSpacing: ".12em" }}>{grp.label}</span>
-                              <button
-                                onClick={() => toggleGroup(grp.factors, grpOff)}
-                                style={{ fontSize: 10, fontWeight: 700, color: EQ.navy, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", textTransform: "uppercase", letterSpacing: ".05em", padding: 0 }}
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: collapsedGroups.has(grp.label) ? 0 : 8 }}>
+                              <span
+                                onClick={() => setCollapsedGroups(prev => {
+                                  const next = new Set(prev);
+                                  next.has(grp.label) ? next.delete(grp.label) : next.add(grp.label);
+                                  return next;
+                                })}
+                                style={{ fontSize: 11, fontWeight: 700, color: "#1e3a5f", textTransform: "uppercase", letterSpacing: ".12em", cursor: "pointer", display: "flex", alignItems: "center", gap: 5, userSelect: "none" }}
                               >
-                                Toggle All
-                              </button>
+                                <span style={{ fontSize: 8, color: EQ.textMuted, lineHeight: 1 }}>{collapsedGroups.has(grp.label) ? "▶" : "▼"}</span>
+                                {grp.label}
+                              </span>
+                              {!collapsedGroups.has(grp.label) && (
+                                <button
+                                  onClick={() => toggleGroup(grp.factors, grpOff)}
+                                  style={{ fontSize: 10, fontWeight: 700, color: EQ.navy, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", textTransform: "uppercase", letterSpacing: ".05em", padding: 0 }}
+                                >
+                                  Toggle All
+                                </button>
+                              )}
                             </div>
                             {/* Factor rows */}
-                            {grp.factors.map(name => {
+                            {!collapsedGroups.has(grp.label) && grp.factors.map(name => {
                               const f = factorMap[name];
                               if (!f) return null;
                               const isOn = enabled[name];
