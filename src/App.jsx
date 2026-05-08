@@ -1195,8 +1195,8 @@ export default function App() {
                 {/* Header */}
                 <div style={{ background: EQ.white, borderBottom: `1px solid ${EQ.border}`, padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: 14 }}>⚙</span>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: EQ.navy }}>Risk Factor Configuration</span>
+                    <span style={{ fontSize: 16 }}>⚙</span>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: EQ.navy }}>Risk Factor Configuration</span>
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button onClick={enableAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: `1px solid #2a7d4f`, borderRadius: 4, background: "#fff", color: "#2a7d4f" }}>
@@ -1227,7 +1227,7 @@ export default function App() {
                           <div key={gi} style={{ marginBottom: gi < col.groups.length - 1 ? 16 : 0 }}>
                             {/* Group header */}
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                              <span style={{ fontSize: 10, fontWeight: 700, color: EQ.textMuted, textTransform: "uppercase", letterSpacing: ".1em" }}>{grp.label}</span>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e3a5f", textTransform: "uppercase", letterSpacing: ".12em" }}>{grp.label}</span>
                               <button
                                 onClick={() => toggleGroup(grp.factors, grpOff)}
                                 style={{ fontSize: 10, fontWeight: 700, color: EQ.navy, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", textTransform: "uppercase", letterSpacing: ".05em", padding: 0 }}
@@ -1243,10 +1243,10 @@ export default function App() {
                               return (
                                 <div key={name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 8 }}>
                                   <div style={{ flex: 1, minWidth: 0 }}>
-                                    <span style={{ fontSize: 12, color: isOn ? "#1a1a1a" : EQ.textMuted, fontWeight: 700, lineHeight: 1.3, display: "block" }}>
+                                    <span style={{ fontSize: 14, color: isOn ? "#1a2236" : EQ.textMuted, fontWeight: 700, lineHeight: 1.3, display: "block" }}>
                                       {f.displayName || f.name}
                                     </span>
-                                    <span style={{ fontSize: 10, color: EQ.textMuted }}>({(f.weight * 100).toFixed(0)}% base)</span>
+                                    <span style={{ fontSize: 11, color: "#6b7280" }}>({(f.weight * 100).toFixed(0)}% base)</span>
                                   </div>
                                   <Toggle on={isOn} onChange={val => toggleFactor(name, val)} />
                                 </div>
@@ -1306,8 +1306,8 @@ export default function App() {
                   <div style={{ padding: "9px 12px 7px", display: "grid", gridTemplateColumns: "1fr auto auto auto", gap: 10, alignItems: "center", borderBottom: `1px solid ${EQ.border}`, background: f.isOn ? "#f9fafc" : "#eaecf1" }}>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 7 }}>
                       <span style={{ fontSize: 10, color: f.isOn ? EQ.gold : EQ.textMuted, fontWeight: 800 }}>#{idx + 1}</span>
-                      <span style={{ fontWeight: 700, fontSize: 13, color: EQ.navy }}>{f.displayName || f.name}</span>
-                      <span style={{ fontSize: 10, color: EQ.textMuted, marginLeft: 2 }}>{f.desc}</span>
+                      <span style={{ fontWeight: 700, fontSize: 15, color: EQ.navy }}>{f.displayName || f.name}</span>
+                      <span style={{ fontSize: 11, color: "#6b7280", marginLeft: 2 }}>{f.desc}</span>
                     </div>
 
                     {/* Weight display */}
