@@ -959,12 +959,12 @@ export default function App() {
             const weightsNormalized = anyDisabled;
             // cols: Factor | Base Wt | [Eff. Wt if normalized] | Score | Weighted
             const cols = weightsNormalized
-              ? "1fr 36px 36px 24px 48px"
-              : "1fr 40px 24px 48px";
+              ? "1fr 44px 48px 32px 56px"
+              : "1fr 48px 32px 56px";
             return (
               <div style={{ marginTop: 16, background: EQ.white, borderRadius: 6, border: `1px solid ${EQ.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
                 <div style={{ background: EQ.navy, padding: "8px 14px" }}>
-                  <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: EQ.gold, fontWeight: 700 }}>Score Breakdown</span>
+                  <span style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: EQ.gold, fontWeight: 700 }}>Score Breakdown</span>
                 </div>
                 <div style={{ padding: "10px 14px 6px" }}>
                   {weightsNormalized && (
@@ -974,27 +974,27 @@ export default function App() {
                   )}
                   {/* Header */}
                   <div style={{ display: "grid", gridTemplateColumns: cols, gap: 3, paddingBottom: 5, borderBottom: `1px solid ${EQ.border}`, marginBottom: 3 }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: EQ.textMuted }}>Factor</span>
-                    <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: EQ.textMuted, textAlign: "right" }}>Base</span>
-                    {weightsNormalized && <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: EQ.gold, textAlign: "right" }}>Eff.</span>}
-                    <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: EQ.textMuted, textAlign: "right" }}>Scr</span>
-                    <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: EQ.textMuted, textAlign: "right" }}>Wtd</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: "#1e3a5f" }}>Factor</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: "#1e3a5f", textAlign: "right" }}>Base</span>
+                    {weightsNormalized && <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: EQ.gold, textAlign: "right" }}>Eff.</span>}
+                    <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: "#1e3a5f", textAlign: "right" }}>Scr</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", color: "#1e3a5f", textAlign: "right" }}>Wtd</span>
                   </div>
                   {/* Factor rows */}
                   {scoringContribs.map((f, i) => (
                     <div key={f.name} style={{ padding: "3px 0", borderBottom: i < scoringContribs.length - 1 ? `1px solid ${EQ.border}66` : "none", opacity: f.isOn ? 1 : 0.35 }}>
                       <div style={{ display: "grid", gridTemplateColumns: cols, gap: 3, alignItems: "center" }}>
-                        <span style={{ fontSize: 10, color: EQ.navy, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{f.displayName}</span>
-                        <span style={{ fontSize: 10, color: EQ.textMuted, textAlign: "right", fontFamily: "monospace" }}>{(f.weight * 100).toFixed(0)}%</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: EQ.navy, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{f.displayName}</span>
+                        <span style={{ fontSize: 12, color: "#6b7280", textAlign: "right", fontFamily: "monospace" }}>{(f.weight * 100).toFixed(0)}%</span>
                         {weightsNormalized && (
-                          <span style={{ fontSize: 10, color: f.isOn && f.isComplete ? EQ.gold : EQ.textMuted, textAlign: "right", fontFamily: "monospace", fontWeight: f.isOn && f.isComplete ? 700 : 400 }}>
+                          <span style={{ fontSize: 12, color: f.isOn && f.isComplete ? EQ.gold : EQ.textMuted, textAlign: "right", fontFamily: "monospace", fontWeight: f.isOn && f.isComplete ? 700 : 400 }}>
                             {f.isOn && f.isComplete ? (f.effectiveWeight * 100).toFixed(1) + "%" : "—"}
                           </span>
                         )}
-                        <span style={{ fontSize: 11, fontWeight: 700, color: f.isOn ? EQ.gold : EQ.textMuted, textAlign: "right", fontFamily: "monospace" }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: f.isOn ? EQ.gold : EQ.textMuted, textAlign: "right", fontFamily: "monospace" }}>
                           {f.isOn && f.needsDual ? `E:${f.score}` : f.isOn ? f.score : "—"}
                         </span>
-                        <span style={{ fontSize: 10, color: f.isOn && !f.isComplete ? "#c05000" : EQ.navy, textAlign: "right", fontFamily: "monospace" }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: f.isOn && !f.isComplete ? "#c05000" : EQ.navy, textAlign: "right", fontFamily: "monospace" }}>
                           {f.isOn && f.isComplete ? f.contrib.toFixed(3) : f.isOn && !f.isComplete ? "N/A" : "—"}
                         </span>
                       </div>
@@ -1007,15 +1007,15 @@ export default function App() {
                   ))}
                   {/* Total row */}
                   <div style={{ display: "grid", gridTemplateColumns: cols, gap: 3, paddingTop: 6, marginTop: 3, borderTop: `2px solid ${EQ.navy}` }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: EQ.navy }}>Total</span>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: EQ.textMuted, textAlign: "right", fontFamily: "monospace" }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: EQ.navy }}>Total</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: EQ.navy, textAlign: "right", fontFamily: "monospace" }}>
                       {(scoringContribs.filter(f => f.isOn).reduce((s, f) => s + f.weight, 0) * 100).toFixed(0)}%
                     </span>
                     {weightsNormalized && (
-                      <span style={{ fontSize: 10, fontWeight: 700, color: EQ.gold, textAlign: "right", fontFamily: "monospace" }}>100%</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: EQ.gold, textAlign: "right", fontFamily: "monospace" }}>100%</span>
                     )}
-                    <span style={{ fontSize: 11, fontWeight: 700, color: EQ.navy, textAlign: "right", fontFamily: "monospace" }}>—</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: EQ.navy, textAlign: "right", fontFamily: "monospace" }}>{CRS.toFixed(3)}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: EQ.navy, textAlign: "right", fontFamily: "monospace" }}>—</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: EQ.navy, textAlign: "right", fontFamily: "monospace" }}>{CRS.toFixed(3)}</span>
                   </div>
                   {fundType === "Hybrid" && (
                     <div style={{ marginTop: 6, fontSize: 9, color: EQ.textMuted, fontStyle: "italic" }}>* Blended score (Eq × {hybridSplit}% + Dt × {100 - hybridSplit}%)</div>
