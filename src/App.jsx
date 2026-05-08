@@ -238,7 +238,7 @@ const FUND_TYPE_MODEL_EXCLUSIONS = {
 
 // Equiton brand palette
 const EQ = {
-  navy:       "#2e3a55",
+  navy:       "#1e3a5f",
   navyLight:  "#3d4a6a",
   gold:       "#c9a020",
   goldLight:  "#f5edd6",
@@ -440,9 +440,9 @@ function CriteriaTable({ criteria, selectedScore }) {
     <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 0, fontSize: 11, fontFamily: "sans-serif" }}>
       <thead>
         <tr style={{ background: EQ.navy }}>
-          <th style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: EQ.gold, fontSize: 10, letterSpacing: ".08em", width: 52 }}>SCORE</th>
-          <th style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: EQ.gold, fontSize: 10, letterSpacing: ".08em", width: 70 }}>TIER</th>
-          <th style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: EQ.gold, fontSize: 10, letterSpacing: ".08em" }}>CRITERIA</th>
+          <th style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: "#ffffff", fontSize: 10, letterSpacing: ".08em", width: 52 }}>SCORE</th>
+          <th style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: "#ffffff", fontSize: 10, letterSpacing: ".08em", width: 70 }}>TIER</th>
+          <th style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: "#ffffff", fontSize: 10, letterSpacing: ".08em" }}>CRITERIA</th>
         </tr>
       </thead>
       <tbody>
@@ -841,7 +841,7 @@ export default function App() {
           <div style={{ display: "flex", alignItems: "center", gap: 24, padding: "18px 0 14px" }}>
             {/* Date + factor count */}
             <div style={{ textAlign: "right", borderRight: `1px solid ${EQ.gold}30`, paddingRight: 24 }}>
-              <div style={{ fontSize: 9, color: EQ.gold, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 2 }}>Assessment Date</div>
+              <div style={{ fontSize: 9, color: "#ffffff", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 2, opacity: 0.85 }}>Assessment Date</div>
               <div style={{ fontSize: 13, color: "#ffffff", fontWeight: 600 }}>{today}</div>
               <div style={{ fontSize: 9, color: "#7a8099", marginTop: 3 }}>{activeContribs.length} of {factors.length} factors active</div>
             </div>
@@ -918,7 +918,7 @@ export default function App() {
           {/* Top Risk Drivers */}
           <div style={{ marginTop: 16, background: EQ.white, borderRadius: 6, border: `1px solid ${EQ.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
             <div style={{ background: EQ.navy, padding: "8px 14px" }}>
-              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: EQ.gold, fontWeight: 700 }}>Top Risk Drivers</span>
+              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Top Risk Drivers</span>
             </div>
             <div style={{ padding: "12px 14px" }}>
               {top5.map((f, i) => (
@@ -934,7 +934,7 @@ export default function App() {
           {/* Risk Tier Reference */}
           <div style={{ marginTop: 16, background: EQ.white, borderRadius: 6, border: `1px solid ${EQ.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
             <div style={{ background: EQ.navy, padding: "8px 14px" }}>
-              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: EQ.gold, fontWeight: 700 }}>Risk Tier Reference</span>
+              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Risk Tier Reference</span>
             </div>
             <div style={{ padding: "12px 14px" }}>
               {[
@@ -964,7 +964,7 @@ export default function App() {
             return (
               <div style={{ marginTop: 16, background: EQ.white, borderRadius: 6, border: `1px solid ${EQ.border}`, overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
                 <div style={{ background: EQ.navy, padding: "8px 14px" }}>
-                  <span style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: EQ.gold, fontWeight: 700 }}>Score Breakdown</span>
+                  <span style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Score Breakdown</span>
                 </div>
                 <div style={{ padding: "10px 14px 6px" }}>
                   {weightsNormalized && (
@@ -1033,7 +1033,7 @@ export default function App() {
           <div style={{ background: EQ.white, borderRadius: 6, border: `1px solid ${EQ.border}`, marginBottom: 16, overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
             <div style={{ background: EQ.navy, padding: "8px 16px", display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 13 }}>🏢</span>
-              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: EQ.gold, fontWeight: 700 }}>Fund Details</span>
+              <span style={{ fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Fund Details</span>
             </div>
             <div style={{ padding: "16px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, alignItems: "start" }}>
@@ -1264,7 +1264,7 @@ export default function App() {
 
           {/* Section label bar */}
           <div style={{ background: EQ.navy, borderRadius: "6px 6px 0 0", padding: "9px 16px", marginBottom: 0 }}>
-            <span style={{ fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: EQ.gold, fontWeight: 700 }}>
+            <span style={{ fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>
               Factor Scoring — 1 (Low Risk) to 5 (High Risk)
             </span>
           </div>
