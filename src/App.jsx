@@ -503,7 +503,7 @@ function Toggle({ on, onChange }) {
 }
 
 export default function App() {
-  const [scores,       setScores]      = useState(Object.fromEntries(factors.map(f => [f.name, 3])));
+  const [scores,       setScores]      = useState(Object.fromEntries(factors.map(f => [f.name, null])));
   const [debtScores,   setDebtScores]  = useState(Object.fromEntries(factors.map(f => [f.name, null])));
   const [enabled,      setEnabled]     = useState(Object.fromEntries(factors.map(f => [f.name, true])));
   const [reasons,      setReasons]     = useState(Object.fromEntries(factors.map(f => [f.name, ""])));
@@ -528,7 +528,7 @@ export default function App() {
   };
 
   const handleReset = () => {
-    setScores(Object.fromEntries(factors.map(f => [f.name, 3])));
+    setScores(Object.fromEntries(factors.map(f => [f.name, null])));
     setDebtScores(Object.fromEntries(factors.map(f => [f.name, null])));
     setEnabled(Object.fromEntries(factors.map(f => [f.name, true])));
     setReasons(Object.fromEntries(factors.map(f => [f.name, ""])));
@@ -569,10 +569,11 @@ export default function App() {
     () => factors.filter(f => {
       if (!enabled[f.name]) return false;
       if (isModelExcluded(f.name)) return false;
+      if (scores[f.name] == null) return false;
       if (isHybridSS(f.name) && debtScores[f.name] == null) return false;
       return true;
     }).reduce((s, f) => s + f.weight, 0),
-    [enabled, fundType, debtScores]
+    [enabled, fundType, debtScores, scores]
   );
 
   const contribs = useMemo(() => factors.map(f => {
@@ -580,12 +581,15 @@ export default function App() {
     const modelExcluded = isModelExcluded(f.name);
     const needsDual = isHybridSS(f.name);
     const dScore = debtScores[f.name];
-    const isComplete = !needsDual || dScore != null;
+    const hasScore = scores[f.name] != null;
+    const isComplete = hasScore && (!needsDual || dScore != null);
     const canContribute = isOn && !modelExcluded && isComplete;
 
-    const blendedScore = needsDual && dScore != null
-      ? scores[f.name] * (hybridSplit / 100) + dScore * ((100 - hybridSplit) / 100)
-      : scores[f.name];
+    const blendedScore = !hasScore
+      ? 0
+      : needsDual && dScore != null
+        ? scores[f.name] * (hybridSplit / 100) + dScore * ((100 - hybridSplit) / 100)
+        : scores[f.name];
 
     const effectiveWeight = canContribute && activeWeightSum > 0 ? f.weight / activeWeightSum : 0;
 
@@ -992,7 +996,7 @@ export default function App() {
                           </span>
                         )}
                         <span style={{ fontSize: 13, fontWeight: 700, color: f.isOn ? EQ.gold : EQ.textMuted, textAlign: "right", fontFamily: "monospace" }}>
-                          {f.isOn && f.needsDual ? `E:${f.score}` : f.isOn ? f.score : "—"}
+                          {f.isOn && f.score != null && f.needsDual ? `E:${f.score}` : f.isOn && f.score != null ? f.score : "—"}
                         </span>
                         <span style={{ fontSize: 12, fontWeight: 600, color: f.isOn && !f.isComplete ? "#c05000" : EQ.navy, textAlign: "right", fontFamily: "monospace" }}>
                           {f.isOn && f.isComplete ? f.contrib.toFixed(3) : f.isOn && !f.isComplete ? "N/A" : "—"}
