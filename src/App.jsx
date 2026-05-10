@@ -13,7 +13,7 @@ const factors = [
     ],
   },
   {
-    name: "Concentration", displayName: "Concentration / Diversification", weight: 0.15,
+    name: "Concentration", displayName: "Concentration/ Diversification", weight: 0.15,
     desc: "Single-issuer or sector exposure",
     criteria: [
       "200+ assets; 5+ provinces; multiple property types; thousands of residential tenants; no single asset over 2% of portfolio.",
@@ -35,7 +35,7 @@ const factors = [
     ],
   },
   {
-    name: "Asset Class", displayName: "Asset Class", weight: 0.05,
+    name: "Asset Class", displayName: "Registration/ Corporate Governance", weight: 0.05,
     desc: "Inherent risk of underlying asset class",
     criteria: [
       "Exchange-listed or prospectus-qualified vehicle with daily liquidity (theoretical floor; outside private RE universe).",
@@ -46,7 +46,7 @@ const factors = [
     ],
   },
   {
-    name: "Track Record", displayName: "Track Record / Performance", weight: 0.05,
+    name: "Track Record", displayName: "Track Record/ Performance", weight: 0.05,
     desc: "Manager performance history and vintage",
     criteria: [
       "15+ year audited track record across multiple cycles including rising-rate environments; distributions never suspended; zero NAV impairment events.",
@@ -134,7 +134,7 @@ const factors = [
     ],
   },
   {
-    name: "Pricing Risk", displayName: "Valuation/Pricing Risk", weight: 0.03,
+    name: "Pricing Risk", displayName: "Valuation/ Pricing Risk", weight: 0.03,
     desc: "Valuation opacity and IFRS NAV reliability",
     criteria: [
       "Quarterly independent appraisals by named national firm (e.g., CBRE or Cushman & Wakefield); majority-independent valuation committee; transaction-benchmarked NAV.",
@@ -167,7 +167,7 @@ const factors = [
     ],
   },
   {
-    name: "VaR", displayName: "Value at Risk / Drawdown", weight: 0.02,
+    name: "VaR", displayName: "Value at Risk/ Drawdown", weight: 0.02,
     desc: "Statistical value-at-risk exposure",
     criteria: [
       "Maximum historical NAV drawdown under 5%; estimated stress loss under 5% in a 20% property value correction; conservative leverage provides strong equity buffer.",
@@ -544,6 +544,7 @@ export default function App() {
   const [debtScores,   setDebtScores]  = useState(Object.fromEntries(factors.map(f => [f.name, null])));
   const [enabled,      setEnabled]     = useState(Object.fromEntries(factors.map(f => [f.name, true])));
   const [reasons,      setReasons]     = useState(Object.fromEntries(factors.map(f => [f.name, ""])));
+  const [notes,        setNotes]       = useState(Object.fromEntries(factors.map(f => [f.name, ""])));
   const [fund,         setFund]        = useState("");
   const [fundType,     setFundType]    = useState("Equity");
   const [hybridSplit,  setHybridSplit] = useState(65); // equity %
@@ -570,6 +571,7 @@ export default function App() {
     setDebtScores(Object.fromEntries(factors.map(f => [f.name, null])));
     setEnabled(Object.fromEntries(factors.map(f => [f.name, true])));
     setReasons(Object.fromEntries(factors.map(f => [f.name, ""])));
+    setNotes(Object.fromEntries(factors.map(f => [f.name, ""])));
     setFund("");
     setFundType("Equity");
     setHybridSplit(65);
@@ -699,12 +701,13 @@ export default function App() {
           </div>`;
       }
 
+      const factorNote = notes[f.name] || "";
       return `
         <div style="margin-bottom:14px;border:1px solid #dde0ea;border-radius:6px;overflow:hidden;page-break-inside:avoid;">
           <div style="background:#f9fafc;border-bottom:1px solid #dde0ea;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">
             <div>
               <span style="font-size:10px;color:#c9a020;font-weight:800;margin-right:6px;">#${idx + 1}</span>
-              <span style="font-weight:700;font-size:13px;color:#2e3a55;">${f.name}</span>
+              <span style="font-weight:700;font-size:13px;color:#2e3a55;">${f.displayName || f.name}</span>
             </div>
             <div style="text-align:right;font-size:11px;white-space:nowrap;">
               <span style="font-weight:700;color:${weightChanged ? "#c9a020" : "#2e3a55"};">${weightPct}%</span>
@@ -726,6 +729,11 @@ export default function App() {
             </thead>
             <tbody>${criteriaRows}</tbody>
           </table>
+          ${factorNote.trim() ? `
+          <div style="padding:8px 12px;border-top:1px solid #dde0ea;background:#fafbfc;">
+            <div style="font-size:9px;font-weight:700;color:#2e3a55;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Analyst Notes</div>
+            <div style="font-size:11px;color:#333;line-height:1.6;white-space:pre-wrap;">${factorNote.trim()}</div>
+          </div>` : ""}
         </div>`;
     }).join("");
 
@@ -1468,6 +1476,35 @@ export default function App() {
                           })}
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {/* ── Analyst Notes ── */}
+                  {f.isOn && f.isComplete && (
+                    <div style={{ padding: "8px 12px 10px", borderTop: `1px solid ${EQ.border}`, background: "#fafbfc" }}>
+                      <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: EQ.navy, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 5 }}>
+                        Analyst Notes
+                      </label>
+                      <textarea
+                        value={notes[f.name] || ""}
+                        onChange={e => setNotes(prev => ({ ...prev, [f.name]: e.target.value }))}
+                        placeholder="Enter your rationale for this rating…"
+                        rows={3}
+                        style={{
+                          width: "100%",
+                          padding: "6px 8px",
+                          fontSize: 11,
+                          fontFamily: "inherit",
+                          border: `1px solid ${EQ.border}`,
+                          borderRadius: 4,
+                          background: EQ.white,
+                          color: EQ.navy,
+                          resize: "vertical",
+                          boxSizing: "border-box",
+                          outline: "none",
+                          lineHeight: 1.5,
+                        }}
+                      />
                     </div>
                   )}
 
