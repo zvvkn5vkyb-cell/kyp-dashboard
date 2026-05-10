@@ -134,7 +134,7 @@ const factors = [
     ],
   },
   {
-    name: "Pricing Risk", displayName: "Pricing Risk", weight: 0.03,
+    name: "Pricing Risk", displayName: "Valuation/Pricing Risk", weight: 0.03,
     desc: "Valuation opacity and IFRS NAV reliability",
     criteria: [
       "Quarterly independent appraisals by named national firm (e.g., CBRE or Cushman & Wakefield); majority-independent valuation committee; transaction-benchmarked NAV.",
@@ -392,44 +392,81 @@ function getTier(crs) {
 }
 
 function GaugeArc({ crs }) {
-  const pct = Math.min(crs / 5, 1);
+  const score = Math.min(Math.max(crs, 0), 5);
+  const pct   = score / 5;
   const angle = -135 + pct * 270;
-  const r = 70, cx = 100, cy = 100;
-  const tier = getTier(crs);
+  const tier  = getTier(score);
 
-  const pt = (deg, rad) => ({
-    x: cx + rad * Math.cos(deg * Math.PI / 180),
-    y: cy + rad * Math.sin(deg * Math.PI / 180),
-  });
+  const cx = 130, cy = 104, r = 83, sw = 16;
 
-  const arc = (s, e) => {
-    const a = pt(s, r), b = pt(e, r);
-    return `M ${a.x} ${a.y} A ${r} ${r} 0 ${e - s > 180 ? 1 : 0} 1 ${b.x} ${b.y}`;
+  const pt = (deg, rad) => [
+    cx + rad * Math.cos((deg * Math.PI) / 180),
+    cy + rad * Math.sin((deg * Math.PI) / 180),
+  ];
+
+  const arcPath = (s, e, rad) => {
+    const [ax, ay] = pt(s, rad);
+    const [bx, by] = pt(e, rad);
+    return `M ${ax} ${ay} A ${rad} ${rad} 0 ${e - s > 180 ? 1 : 0} 1 ${bx} ${by}`;
   };
 
   const zones = [
-    [-135, -81, "#2a7d4f"],
-    [-81,  -27, "#4a7c2f"],
-    [-27,   27, "#b08000"],
-    [27,    81, "#c05000"],
-    [81,   135, "#b02020"],
+    { s: -135, e:  -81, color: "#2a7d4f" },
+    { s:  -81, e:  -27, color: "#4a7c2f" },
+    { s:  -27, e:   27, color: "#b08000" },
+    { s:   27, e:   81, color: "#c05000" },
+    { s:   81, e:  135, color: "#b02020" },
   ];
 
-  const needle = pt(angle, r - 12);
+  const boundaries = [-81, -27, 27, 81];
+  const [nx, ny]   = pt(angle, r - 17);
+  const [bkx, bky] = pt(angle + 180, 19);
 
   return (
-    <svg viewBox="0 0 200 160" style={{ width: "100%", maxWidth: 240, display: "block" }}>
-      {zones.map(([s, e, c], i) => (
-        <path key={i} d={arc(s, e)} fill="none" stroke={c} strokeWidth={12} strokeLinecap="round" opacity={0.22} />
+    <svg viewBox="0 0 260 200" style={{ width: "100%", maxWidth: 280, display: "block", margin: "0 auto" }}>
+
+      {/* Track background */}
+      <path d={arcPath(-135, 135, r)} fill="none" stroke="#e8eaef" strokeWidth={sw + 6} strokeLinecap="butt" />
+
+      {/* Zone arcs — segmented background */}
+      {zones.map((z, i) => (
+        <path key={i} d={arcPath(z.s + 1.5, z.e - 1.5, r)} fill="none" stroke={z.color} strokeWidth={sw} opacity={0.22} />
       ))}
-      <path d={arc(-135, angle)} fill="none" stroke={tier.color} strokeWidth={12} strokeLinecap="round" />
-      <line x1={cx} y1={cy} x2={needle.x} y2={needle.y} stroke={tier.color} strokeWidth={2.5} strokeLinecap="round" />
+
+      {/* Active arc — soft glow layer */}
+      {score > 0 && (
+        <path d={arcPath(-135, angle, r)} fill="none" stroke={tier.color} strokeWidth={sw + 12} strokeLinecap="round" opacity={0.12} />
+      )}
+
+      {/* Active arc */}
+      {score > 0 && (
+        <path d={arcPath(-135, angle, r)} fill="none" stroke={tier.color} strokeWidth={sw} strokeLinecap="round" />
+      )}
+
+      {/* Zone boundary tick marks */}
+      {boundaries.map((deg, i) => {
+        const [x1, y1] = pt(deg, r - sw / 2 - 1);
+        const [x2, y2] = pt(deg, r + sw / 2 + 1);
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth={2.5} opacity={0.9} />;
+      })}
+
+      {/* Needle counterbalance */}
+      <line x1={cx} y1={cy} x2={bkx} y2={bky} stroke={tier.color} strokeWidth={2.5} strokeLinecap="round" opacity={0.3} />
+
+      {/* Needle */}
+      <line x1={cx} y1={cy} x2={nx} y2={ny} stroke={tier.color} strokeWidth={2} strokeLinecap="round" />
+
+      {/* Hub — outer ring */}
+      <circle cx={cx} cy={cy} r={10} fill="white" stroke={tier.color} strokeWidth={2.5} />
+      {/* Hub — inner fill */}
       <circle cx={cx} cy={cy} r={5} fill={tier.color} />
-      <text x={cx} y={cy + 32} textAnchor="middle" fontSize={22} fontWeight={600} fill={tier.color} fontFamily="Inter,Helvetica Neue,Arial,sans-serif">
-        {crs.toFixed(2)}
+
+      {/* Score value */}
+      <text x={cx} y={cy + 38} textAnchor="middle" fontSize={30} fontWeight={700} fill={tier.color} fontFamily="Inter,Helvetica Neue,Arial,sans-serif">
+        {score.toFixed(2)}
       </text>
-      <text x={cx} y={cy + 47} textAnchor="middle" fontSize={9} fill="#999" fontFamily="sans-serif">
-        of 5.00
+      <text x={cx} y={cy + 53} textAnchor="middle" fontSize={9} fill="#9aa0b0" fontFamily="sans-serif" letterSpacing="0.5">
+        OF 5.00
       </text>
     </svg>
   );
@@ -649,7 +686,6 @@ export default function App() {
               <div>
                 <span style="font-size:10px;color:#aaa;font-weight:800;margin-right:6px;">#${idx + 1}</span>
                 <span style="font-weight:700;font-size:13px;color:#2e3a55;">${f.name}</span>
-                <span style="font-size:10px;color:#7a8099;margin-left:6px;">${f.desc}</span>
               </div>
               <span style="font-size:10px;color:#c05000;font-weight:700;background:#fef0e6;padding:2px 8px;border-radius:3px;">EXCLUDED</span>
             </div>
@@ -669,7 +705,6 @@ export default function App() {
             <div>
               <span style="font-size:10px;color:#c9a020;font-weight:800;margin-right:6px;">#${idx + 1}</span>
               <span style="font-weight:700;font-size:13px;color:#2e3a55;">${f.name}</span>
-              <span style="font-size:10px;color:#7a8099;margin-left:6px;">${f.desc}</span>
             </div>
             <div style="text-align:right;font-size:11px;white-space:nowrap;">
               <span style="font-weight:700;color:${weightChanged ? "#c9a020" : "#2e3a55"};">${weightPct}%</span>
@@ -1336,7 +1371,6 @@ export default function App() {
                     <div style={{ display: "flex", alignItems: "baseline", gap: 7 }}>
                       <span style={{ fontSize: 10, color: f.isOn ? EQ.gold : EQ.textMuted, fontWeight: 800 }}>#{idx + 1}</span>
                       <span style={{ fontWeight: 700, fontSize: 15, color: EQ.navy }}>{f.displayName || f.name}</span>
-                      <span style={{ fontSize: 11, color: "#6b7280", marginLeft: 2 }}>{f.desc}</span>
                     </div>
 
                     {/* Weight display */}
