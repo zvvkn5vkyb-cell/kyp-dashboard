@@ -231,7 +231,7 @@ const STRUCTURE_SENSITIVE = new Set([
 
 // Factors excluded from the scoring model by fund type (still shown in config panel)
 const FUND_TYPE_MODEL_EXCLUSIONS = {
-  Equity: new Set(["Derivatives Actual", "Derivatives OM", "FX Hedging", "FX OM"]),
+  Equity: new Set(),
   Debt:   new Set(),
   Hybrid: new Set(),
 };
