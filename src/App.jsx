@@ -2,232 +2,196 @@ import React, { useState, useMemo } from "react";
 
 const factors = [
   {
-    name: "Liquidity", displayName: "Liquidity", weight: 0.19,
-    desc: "Ease of redemption and lock-up terms",
+    name: "PriceDiscovery", displayName: "Price Discovery & Pricing Risk", weight: 0.12,
+    desc: "Valuation observability, pricing frequency, and governance",
     criteria: [
-      "Monthly redemptions; no fee; no notice period; no aggregate cap; negligible gate risk.",
-      "Monthly redemptions; 30-day notice; modest DSC phasing out within 18 months; aggregate cap up to 10% per month; no gate history.",
-      "Quarterly redemptions; 90-day notice; aggregate cap 5–10% NAV per quarter; standard DSC schedule; theoretical gate risk; no gate history.",
-      "Quarterly; gate risk elevated; active or recently triggered Managed Redemption Program; material DSC; redemption reliability uncertain.",
-      "Redemptions suspended or indefinitely deferred; entirely at manager discretion; no secondary market.",
+      "Security relies on highly observable market inputs, with frequent price discovery (e.g., daily or continuous), independent valuation, and minimal sensitivity to discretionary assumptions. Governance is strong, with robust oversight and standardized methodologies.",
+      "Security uses mostly observable inputs, with regular price discovery (e.g., monthly or frequent external validation). Valuations are generally independent, though some assumptions require judgment. Sensitivity to key inputs is moderate, and governance frameworks are solid.",
+      "Security relies on a mix of observable and unobservable inputs, with periodic price discovery (e.g., quarterly appraisals or infrequent market evidence). Independence may be partial, with internal models playing a meaningful role. Valuations show moderate sensitivity to assumptions, and governance is adequate but not robust.",
+      "Security depends heavily on unobservable inputs, with infrequent or inconsistent price discovery. Valuations rely substantially on internal models, with limited external validation. Pricing is highly sensitive to small changes in assumptions, and governance may be weak or inconsistently applied.",
+      "Security uses opaque, highly discretionary valuation practices, with minimal external oversight and rare or absent price discovery. Inputs are largely unobservable, methodologies may lack transparency, and valuations are extremely sensitive to internal assumptions. Governance is weak or absent.",
     ],
   },
   {
-    name: "Concentration", displayName: "Concentration/ Diversification", weight: 0.15,
-    desc: "Single-issuer or sector exposure",
+    name: "Liquidity", displayName: "Liquidity", weight: 0.12,
+    desc: "Market depth, execution quality, and secondary market reliability",
     criteria: [
-      "200+ assets; 5+ provinces; multiple property types; thousands of residential tenants; no single asset over 2% of portfolio.",
-      "100–200 assets; 3–4 provinces; primarily one asset type with meaningful sub-diversification; no single asset over 5%.",
-      "30–100 assets; 2–3 provinces; single asset class; primary market concentration; diffuse residential or diversified commercial tenants.",
-      "10–30 assets; 1–2 markets; single sector; top-5 tenants over 30% of revenue; limited sub-diversification.",
-      "Fewer than 10 assets; single market; single asset type; 1–3 dominant tenants or single development project.",
+      "Security trades in deep, high volume markets with tight spreads, fast execution, and minimal price impact. Liquidity remains reliable even in stress. Settlement is standard, and multiple market makers are active.",
+      "Security has generally good liquidity, but with modest frictions. Volume is moderate, spreads are slightly wider, and some slippage may occur during volatility. Liquidity can thin under stress, though dealer support is usually present.",
+      "Security shows lower depth and wider spreads, and execution quality depends on timing. Trades may require staging, and liquidity varies with market regime.",
+      "Security trades thinly or episodically, with wide and volatile spreads, uncertain execution, and unreliable market maker support. Liquidity deteriorates sharply during stress.",
+      "Security has no meaningful secondary market, infrequent valuation, and uncertain exit timing, often measured in quarters or years. Liquidity is fully discretionary or suspended, with a high likelihood of freezes.",
     ],
   },
   {
-    name: "Time Horizon", displayName: "Time Horizon", weight: 0.09,
-    desc: "Alignment with client investment horizon",
+    name: "Leverage", displayName: "Leverage", weight: 0.10,
+    desc: "Actual leverage deployed and offering document limits",
     criteria: [
-      "No minimum hold; monthly liquidity fee-free; suitable for any horizon including under 1 year.",
-      "1–2 year minimum; monthly redemptions fee-free after 12–18 months; short-notice accessible.",
-      "3–5 year minimum; quarterly redemptions; DSC phasing out over 3 years.",
-      "5–7 year minimum; development pipeline adds 3–5 year stabilization period; quarterly gates possible.",
-      "7–10+ year minimum; active development pipeline with uncertain completion dates; redemptions gated.",
+      "The security employs conservative borrowing in practice and is subject to highly restrictive leverage limits in the offering documents. Actual leverage is minimal and stable, supported by strong cash flow coverage. Borrowing structures are long dated, covenant strong, and predominantly fixed rate, with low refinancing risk. Fund level leverage is absent or immaterial, and leverage behaviour is disciplined. Return enhancement through borrowing is avoided. The offering documents allow only basic senior borrowing, prohibit fund level leverage, and disallow mezzanine, preferred equity, cross collateralization, or leverage stacking.",
+      "The security uses moderate borrowing in practice and is governed by offering documents that permit limited, clearly defined leverage flexibility. Actual leverage is manageable and stable, with healthy cash flow coverage. Fund level leverage may be used tactically, such as for short term facilities, but not structurally. Debt structures are generally sound, though some floating rate exposure or refinancing concentration may exist. The offering documents allow senior borrowing and short term facilities, but restrict long term fund level leverage and prohibit complex stacking structures.",
+      "The security employs higher but controlled leverage in practice and is governed by offering documents that allow meaningful flexibility. Actual leverage may fluctuate due to acquisitions, refinancing, or market conditions. Fund level leverage may be used periodically for liquidity, acquisitions, or portfolio management. Debt structures may include shorter maturities or partial floating rate exposure, and refinancing risk is present but manageable. The offering documents permit senior borrowing, fund level term debt, and selective use of mezzanine or preferred equity, with combined leverage caps set at levels that allow substantial borrowing.",
+      "The security uses elevated leverage in practice and is governed by offering documents that provide broad flexibility. Actual leverage is high and may be volatile, with meaningful compounding effects from both asset level and fund level borrowing. Debt structures may be shorter term, floating rate, layered, or cross collateralized, which increases refinancing and interest rate risk. Cash flow coverage is thinner, and leverage behaviour may be more aggressive. The offering documents allow mezzanine debt, preferred equity, cross collateralized facilities, and long term fund level borrowing. Combined leverage caps may be soft or broadly defined.",
+      "The security employs very high leverage in practice and is governed by offering documents that allow extensive or loosely constrained borrowing. Actual leverage is substantial, rising, or persistent, with significant compounding effects from multiple layers of debt. Debt terms may be short dated, opportunistic, or highly flexible, creating acute refinancing risk. Cash flow coverage is minimal, and leverage behaviour may rely heavily on borrowing to drive returns. The offering documents may allow very high maximum leverage, extensive fund level borrowing, mezzanine debt, preferred equity, cross collateralized structures, and multiple layers of leverage with few hard caps.",
     ],
   },
   {
-    name: "Asset Class", displayName: "Registration/ Corporate Governance", weight: 0.05,
-    desc: "Inherent risk of underlying asset class",
+    name: "InterestRate", displayName: "Interest Rate Risk", weight: 0.08,
+    desc: "Asset/liability matching, rate sensitivity, and hedging effectiveness",
     criteria: [
-      "Exchange-listed or prospectus-qualified vehicle with daily liquidity (theoretical floor; outside private RE universe).",
-      "OM-exempt fund with quarterly independent appraisals; majority-independent trustees; enhanced voluntary disclosure exceeding NI 45-106 minimums.",
-      "Standard OM-exempt private RE fund; NI 45-106 compliant; annual independent appraisals; typical exempt-market disclosure; no exchange listing.",
-      "OM-exempt fund with limited disclosure; infrequent or manager-directed appraisals; related-party governance structure.",
-      "Minimal disclosure; no independent appraisals; unregistered or offshore structure; no regulatory filing.",
+      "Security holds assets with low sensitivity to interest rate movements and maintains strong asset/liability matching. Debt structures closely align with the duration and stability of underlying cash flows. Term structures are long dated, fixed rate, and well staggered, minimizing exposure to resets or refinancing cycles. Hedging programs are comprehensive, effective, and consistently applied, ensuring that interest rate volatility has minimal impact on cash flows or valuations.",
+      "Security holds assets with generally low to moderate sensitivity to rate movements and maintains reasonable asset/liability alignment. Term structures are mostly fixed rate or long dated, though some exposure to resets or refinancing exists. Hedging is present and effective in most conditions, though not fully comprehensive.",
+      "Security holds assets with moderate sensitivity to interest rate changes and exhibits partial asset/liability matching. Term structures may include a mix of fixed and floating rate debt, with reset frequencies that introduce periodic variability in interest costs. Hedging programs may be partial, imperfectly aligned, or inconsistently applied.",
+      "Security holds assets with high sensitivity to rate movements and demonstrates weak asset/liability matching, with debt terms that do not align well with asset cash flow characteristics. Term structures may be short dated, floating rate, or concentrated, increasing exposure to resets and refinancing cycles. Hedging is limited, misaligned, or only partially effective.",
+      "Security holds assets that are extremely sensitive to interest rate movements and exhibits poor asset/liability matching, with short term, floating rate, or opportunistic debt structures that amplify rate exposure. Term structures may be highly concentrated or short dated, creating acute refinancing and reset risk. Hedging is minimal, ineffective, or absent.",
     ],
   },
   {
-    name: "Track Record", displayName: "Track Record/ Performance", weight: 0.05,
-    desc: "Manager performance history and vintage",
+    name: "VaR", displayName: "Value at Risk / Drawdown Risk", weight: 0.08,
+    desc: "Historical drawdown depth, cash flow stability, and loss amplification",
     criteria: [
-      "15+ year audited track record across multiple cycles including rising-rate environments; distributions never suspended; zero NAV impairment events.",
-      "8–15 year audited track record; distributions maintained through at least one full market cycle; minor NAV fluctuation without capital impairment.",
-      "5–8 year audited track record; distributions mostly maintained; not fully tested through a rising-rate cycle.",
-      "2–5 year track record; distribution interruptions or reductions; fund established primarily in low-rate environment.",
-      "Under 2 year track record; no audited performance; new fund or new manager.",
+      "Security has shallow historical drawdowns, stable cash flows, and minimal leverage, with valuations that adjust smoothly and proportionately to market conditions. Liquidity stress does not meaningfully amplify losses, and downside events tend to be short lived and recover quickly.",
+      "Security shows modest historical drawdowns, generally stable cash flows, and moderate leverage that does not materially amplify downside. Valuation elasticity is controlled, with limited sensitivity to small assumption changes. Liquidity stress can widen drawdowns but is usually manageable.",
+      "Security exhibits meaningful historical drawdowns, moderate cash flow volatility, and leverage that can amplify losses in stress scenarios. Valuation elasticity is noticeable, with NAV sensitive to cap rate or discount rate shifts. Liquidity stress can deepen drawdowns through redemption pressure or reduced transaction activity.",
+      "Security has significant historical drawdowns, volatile or cyclical cash flows, and high leverage that materially magnifies downside. Valuation elasticity is high, with NAV highly sensitive to assumption changes or market shocks. Liquidity stress can force asset sales, widen discounts, or trigger gating, deepening losses.",
+      "Security shows severe historical drawdowns, highly volatile or uncertain cash flows, and leverage structures that can trigger forced sales, covenant breaches, or insolvency risk. Valuation elasticity is extreme, with NAV highly dependent on discretionary assumptions. Liquidity stress transmission is strong, often turning valuation declines into prolonged or permanent capital impairment.",
     ],
   },
   {
-    name: "Mandate Scope", displayName: "Mandate Scope", weight: 0.05,
-    desc: "Breadth of permitted investments in OM",
+    name: "Concentration", displayName: "Concentration / Diversification", weight: 0.08,
+    desc: "Portfolio breadth across assets, geographies, and strategies",
     criteria: [
-      "Single asset class; single geography; single strategy — stabilized only; strict OM limits; no related-party structures.",
-      "Single primary asset class; one or two minor permitted strategies (value-add renovation only); minimal related-party arrangements; tight OM boundaries.",
-      "Single asset class with moderate flexibility (value-add permitted; limited development allowed); one region; standard related-party service agreements disclosed.",
-      "Multi-strategy mandate (direct RE plus mortgage lending plus equity positions); multi-geography; material related-party arrangements.",
-      "Unconstrained multi-asset, multi-geography, multi-strategy mandate; extensive related-party structures; broad manager discretion.",
+      "Security is highly diversified across many independent exposures, with no dominant asset, theme, or geography. The portfolio has broad asset types or investment strategies and regional balance. No single holding or cluster meaningfully influences outcomes. Correlation across exposures is low, and performance is driven by a wide base of underlying assets.",
+      "Security is generally well-diversified but shows moderate clustering across certain regions, asset types or investment strategies, or thematic exposures. A few holdings or segments may influence performance, but none dominate. The portfolio still benefits from meaningful diversification, and no single exposure poses outsized risk.",
+      "Security shows noticeable concentration, with meaningful exposure to a limited number of regions, asset types or investment strategies, or thematic drivers. Performance is influenced by a smaller set of exposures. Diversification benefits are present, but only to a moderate degree.",
+      "Security is narrowly diversified, with heavy reliance on a small number of holdings, regions, or asset types or investment strategies. A few exposures drive most of the performance, and the portfolio is sensitive to localized shocks.",
+      "Security is highly concentrated, often dominated by a single asset or investment strategy, region, or thematic exposure. Portfolio outcomes are driven almost entirely by a single exposure or a tightly correlated cluster. Diversification benefits are minimal or nonexistent.",
     ],
   },
   {
-    name: "Leverage Actual", displayName: "Leverage (actual use) LTV", weight: 0.05,
-    desc: "Current leverage ratio deployed",
+    name: "MandateScope", displayName: "Mandate Scope & Non-Core Asset Exposure", weight: 0.07,
+    desc: "Breadth of permitted investments and actual non-core exposure",
     criteria: [
-      "Portfolio LTV under 40%; no construction debt; 100% long-term fixed-rate mortgages; strong DSCR headroom.",
-      "Portfolio LTV 40–55%; primarily fixed-rate; no construction financing; conservative relative to sector norms.",
-      "Portfolio LTV 55–65%; standard institutional leverage; mix of fixed and floating; no construction debt; adequate DSCR.",
-      "Portfolio LTV 65–75%; elevated relative to peer group; some floating-rate or construction debt; DSCR approaching covenant minimum.",
-      "Portfolio LTV over 75%; construction financing; DSCR covenant risk; at or approaching OM maximum.",
+      "A Low Mandate Scope Risk security operates within a narrow, clearly defined mandate with minimal allowable flexibility and negligible non core exposure. The offering documents restrict investments to a tightly focused set of asset types, with no material ability to pursue alternative strategies, higher risk opportunities, or non traditional exposures. Actual non core exposure is near zero. Deviations from the primary mandate are rare, immaterial, and fully disclosed. The strategy is straightforward, transparent, and easy to monitor.",
+      "A Low Medium Mandate Scope Risk security has a reasonably defined mandate with modest flexibility to pursue related or adjacent strategies. Actual non core exposure is present but minor, typically under 10 percent, and used selectively. The offering documents allow limited deviation from the primary strategy, but such activity does not materially alter the overall risk profile. Complexity is moderate, and monitoring remains manageable.",
+      "A Medium Mandate Scope Risk security has a broader mandate with meaningful flexibility across asset types, strategies, or geographies. The offering documents permit a mixed approach, and actual non-core exposure is moderate, typically 10–20 percent. Non-core positions influence risk and return characteristics, but do not dominate the portfolio. Complexity increases as the manager can shift exposures based on market conditions. This requires more oversight.",
+      "A Medium High Mandate Scope Risk security has a wide or loosely defined mandate with significant discretion to pursue varied or complex strategies. The offering documents allow substantial non core activity, including higher risk, opportunistic, or non traditional exposures. Actual non core exposure is significant, typically 20–35 percent, and materially influences the portfolio's risk profile. Future composition becomes less predictable, and monitoring requires heightened oversight.",
+      "A High Mandate Scope Risk security has a very broad or highly flexible mandate with few restrictions on allowable investments. The manager has wide discretion to pursue complex, multi strategy, or non traditional exposures, including extensive non core or cross asset activity. Actual non core exposure is high, typically above 35 percent, and may dominate risk and return outcomes. The portfolio's profile may diverge materially from its stated strategy, and future exposures are difficult to predict.",
     ],
   },
   {
-    name: "Development", displayName: "Non-Core Asset Exposure (Development)", weight: 0.05,
-    desc: "Construction, entitlement or lease-up risk",
+    name: "ReturnVariability", displayName: "Variability of Return Pattern", weight: 0.06,
+    desc: "Distribution stability and NAV volatility",
     criteria: [
-      "0% development exposure; 100% stabilized income-producing assets; no construction financing; no pipeline commitments.",
-      "Under 10% development; minor value-add renovation only; no speculative construction; pipeline completion within 12 months.",
-      "10–25% development exposure; active but contained pipeline; some construction financing; completion expected within 2–3 years.",
-      "25–50% development exposure; material active pipeline; significant construction financing; 3–5 year completion timelines.",
-      "Over 50% development exposure; primarily pre-income assets; minimal current income; 5+ year completion horizons.",
+      "Security exhibits highly stable and predictable return behaviour, with consistent distributions and minimal NAV fluctuation. Income patterns are steady across market conditions, and valuation changes are modest and infrequent. Distribution coverage is strong, and interruptions are rare.",
+      "Security shows generally stable return patterns with some modest variability in distributions or NAV; income may fluctuate slightly with operating conditions, and valuation changes occur periodically but remain controlled. Distribution coverage is solid, though occasional adjustments may occur.",
+      "Security demonstrates noticeable variability in distributions and NAV. Return patterns are influenced by operating performance, market conditions, or asset level events. Distributions may fluctuate meaningfully, and NAV may show moderate volatility.",
+      "Security has significant variability in distributions and NAV, with return patterns heavily influenced by asset level volatility, market cycles, or operational uncertainty; distributions may be inconsistent or periodically reduced, and NAV may experience sharp or frequent adjustments.",
+      "Security exhibits highly unstable return behaviour, with unpredictable or suspended distributions and substantial NAV volatility. Valuation changes may be large, frequent, or discretionary, making return outcomes difficult to forecast.",
     ],
   },
   {
-    name: "Return Variability", displayName: "Variability of Distribution Pattern", weight: 0.04,
-    desc: "Variability of Distribution Pattern",
+    name: "TimeHorizon", displayName: "Time Horizon", weight: 0.05,
+    desc: "Required holding period and alignment with economic value creation cycle",
     criteria: [
-      "Consistent monthly distributions for 5+ years; 100% income-backed; no return of capital; NNN or long-term residential leases.",
-      "Predominantly consistent distributions; minor variability of ±5–10% year-over-year; primarily income-backed; return of capital under 10%.",
-      "Distributions maintained with moderate variability; return of capital 10–40%; modest lease-up or value-add activity affecting near-term income.",
-      "Distributions variable or temporarily reduced or suspended; return of capital over 40%; material development assets limiting current income.",
-      "Distributions suspended; return entirely from capital; no current income from development-stage assets.",
+      "Security has a short term required holding period, with outcomes driven by near term market pricing rather than long cycle value creation. Liquidity is frequent and reliable, and the investment's economic horizon is closely aligned with its redemption terms. Value creation cycles are short or continuous, with no need for multi year execution.",
+      "Security requires a moderate holding period, typically 1–3 years, for return drivers to fully materialize. Liquidity is periodic but reasonably aligned with the economic horizon. Value creation cycles are present but not long duration, and early exit does not materially impair outcomes.",
+      "Security requires a multi year holding period, typically 3–5 years, for value creation activities to unfold. Liquidity is limited but predictable, and generally aligned with the investment's economic cycle.",
+      "Security requires a long holding period, often 5–7 years. Liquidity may be restricted or uncertain relative to the economic cycle. Value creation activities are more intensive and involve complex or multi phase business plans. An early exit may impair outcomes.",
+      "Security requires a very long holding period, often 7+ years, with illiquid or discretionary liquidity terms. Value creation cycles have a long duration. An early exit can significantly impair returns.",
     ],
   },
   {
-    name: "Manager Discipline", displayName: "Manager Discipline", weight: 0.04,
-    desc: "Adherence to stated mandate and limits",
+    name: "ManagerDiscipline", displayName: "Manager Discipline", weight: 0.05,
+    desc: "Mandate adherence, risk controls, and capital allocation consistency",
     criteria: [
-      "Full mandate adherence for 10+ years; no style drift; LTV always within OM limits with meaningful headroom; transparent fees; no related-party conflicts; distributions fully income-backed.",
-      "Consistent mandate adherence; minor LTV fluctuations within stated range; all related-party arrangements fully disclosed; distributions primarily income-backed.",
-      "Generally consistent mandate adherence; LTV within limits but trending toward ceiling; standard related-party arrangements disclosed; distributions include modest return of capital.",
-      "Evidence of style drift; LTV trending toward OM ceiling; distribution smoothing via significant return of capital; related-party fee escalation not fully disclosed.",
-      "Clear mandate violations; LTV exceeding OM maximum; distributions sustained primarily by return of capital; undisclosed related-party arrangements; regulatory actions on record.",
+      "Security is managed with strong adherence to the stated mandate, robust and consistently applied risk controls, disciplined valuation practices, and prudent capital allocation. Deviations from guidelines are rare, well justified, and fully disclosed. Processes are stable, repeatable, and supported by a long tenured team with a strong governance framework.",
+      "Security shows generally strong discipline with occasional but controlled flexibility in mandate interpretation; risk controls are solid but may vary slightly across assets or market conditions. Valuation practices are sound, and capital allocation is mostly consistent with stated strategy.",
+      "Security exhibits moderate discipline, with noticeable but not excessive deviations from mandate, variable application of risk controls, and valuation practices that may rely more heavily on judgment or market conditions. Capital allocation decisions may shift meaningfully over time.",
+      "Security shows significant variability in adherence to mandate, with frequent or material deviations that alter the fund's risk profile. Risk controls may be inconsistently applied, and valuation practices may lack rigor or transparency. Capital allocation may be opportunistic or reactive.",
+      "Security demonstrates weak adherence to mandate, limited or ineffective risk controls, discretionary or opaque valuation practices, and capital allocation that is inconsistent, aggressive, or misaligned with stated objectives. Deviations from guidelines are frequent and may introduce significant unintended risk.",
     ],
   },
   {
-    name: "Leverage OM", displayName: "Leverage (max in OM) LTV", weight: 0.04,
-    desc: "Maximum leverage permitted under OM",
+    name: "Governance", displayName: "Registration / Corporate Governance", weight: 0.05,
+    desc: "Regulatory oversight, board independence, and reporting transparency",
     criteria: [
-      "OM maximum portfolio LTV of 50% or less; hard cap; no exceptions or carve-outs.",
-      "OM maximum portfolio LTV 51–60%; conservative cap with limited headroom above typical operating leverage.",
-      "OM maximum portfolio LTV 61–70%; standard range for stabilized RE; adequate headroom from typical operating leverage.",
-      "OM maximum portfolio LTV 71–80%; elevated ceiling permitting significant leverage; possible construction debt carve-outs.",
-      "OM maximum portfolio LTV over 80% or no stated maximum; construction financing carved out; no hard contractual leverage constraint.",
+      "Security operates under robust regulatory oversight, with a fully independent board, strong fiduciary standards, and high quality, frequent, transparent reporting. Governance structures include independent committees, rigorous valuation oversight, and well documented conflict management frameworks.",
+      "Security has solid governance, with a majority independent board, clear reporting standards, and established oversight processes. Regulatory status is defined and stable, though not as comprehensive as fully regulated structures. Conflicts are monitored, and committees exist but may not be fully independent.",
+      "Security shows mixed governance quality, with limited board independence, moderate disclosure standards, and oversight processes that rely partly on internal controls. Regulatory requirements may be lighter, and conflict management frameworks exist but may not be consistently applied.",
+      "Security has weak governance structures, with little or no board independence, discretionary reporting practices, and oversight that is largely internal. Regulatory status may be minimal, and conflict management processes are informal or inconsistently followed.",
+      "Security operates with minimal regulatory oversight, no independent governance, and opaque or discretionary reporting. Controls are weak, conflicts may be unmanaged, and investors rely almost entirely on the manager for valuation, decision making, and oversight.",
     ],
   },
   {
-    name: "Derivatives Actual", displayName: "Derivatives (actual use)", weight: 0.03,
-    desc: "Current use of derivatives",
+    name: "TrackRecord", displayName: "Track Record / Performance", weight: 0.04,
+    desc: "Performance history length, consistency, and cycle testing",
     criteria: [
-      "No derivative instruments in use; all exposures are direct property or mortgage positions.",
-      "Minimal derivative use; limited to plain-vanilla interest rate swaps for liability hedging only.",
-      "Moderate derivative use; standard hedging instruments with periodic mark-to-market; disclosed in OM.",
-      "Active derivative use; some speculative or leveraged positions; material counterparty exposure.",
-      "Extensive or complex derivative use; significant leverage amplification; limited transparency on positions.",
+      "Security has a long, well established performance history across multiple market cycles. It demonstrates consistent returns, stable volatility, and clear evidence of manager skill. Performance patterns are repeatable and supported by a long tenured management team with a disciplined process.",
+      "Security has a reasonably long performance history with generally consistent results, though with some variability across cycles. The manager has meaningful, but not extensive, tenure, and the return profile shows moderate but acceptable fluctuations.",
+      "Security has a moderate performance history with noticeable variability, moderate cycle testing, or mixed consistency; manager tenure may be moderate, and the return pattern shows periods of both strength and weakness.",
+      "Security has a short or inconsistent performance history, limited evidence of repeatability, or returns that vary significantly across periods; manager tenure may be short, and the strategy may not have been tested through different market environments.",
+      "Security has minimal or no performance history, highly inconsistent results, or returns that lack any demonstrated pattern of repeatability; manager tenure is short or unproven, and the strategy has not been tested across market cycles.",
     ],
   },
   {
-    name: "Pricing Risk", displayName: "Valuation/ Pricing Risk", weight: 0.03,
-    desc: "Valuation opacity and IFRS NAV reliability",
+    name: "KeyPerson", displayName: "Key Person & Team Stability", weight: 0.03,
+    desc: "Team depth, succession planning, and individual dependency",
     criteria: [
-      "Quarterly independent appraisals by named national firm (e.g., CBRE or Cushman & Wakefield); majority-independent valuation committee; transaction-benchmarked NAV.",
-      "Semi-annual independent appraisals; independent NAV review; consistent named appraisal firm.",
-      "Annual independent AACI appraisals; standard exempt-market valuation; NAV updated annually or at acquisition.",
-      "Annual appraisals with manager influence on key assumptions; limited independent valuation oversight; infrequent third-party benchmarking.",
-      "Manager-directed valuations; no independent third-party appraisal; cost-method accounting; no valuation committee or independent governance of NAV.",
+      "The manager is supported by deep, multi layered teams, long tenured leadership, and minimal dependency on any single individual. Succession planning is fully documented, and cross training is embedded. Decision making is committee based rather than concentrated. Turnover is low, retention programs are institutional grade, and the sponsor has a proven history of maintaining team stability through market cycles.",
+      "The manager has several strong senior leaders, adequate team depth, and partial succession planning. Some individuals play outsized roles, but the broader team can maintain continuity if transitions occur. Turnover is manageable, and retention structures exist, though they may not be fully institutional. Decision making is shared, though senior leaders still influence outcomes.",
+      "The manager has moderate team depth, noticeable dependency on one or two senior individuals, and limited or informal succession planning. Turnover may have occurred recently or may be higher than peers. Decision making is partially centralized, and the organization may lack redundancy in critical roles such as acquisitions, asset management, or development.",
+      "The manager has narrow team depth, high dependency on one or two individuals, and no formal succession plan. The organization may be founder led or CIO centric, with limited ability to redistribute responsibilities. Turnover may be elevated, and retention structures may be insufficient to ensure continuity.",
+      "The manager has very limited team depth, extreme dependency on one individual or a small founding group, and no succession planning whatsoever. The fund may rely heavily on personal relationships for deal sourcing, financing, or execution. Turnover may be recent or destabilizing, and the sponsor may lack the resources to recruit or retain replacements.",
     ],
   },
   {
-    name: "Interest Rate", displayName: "Interest Rate Risk — Mortgage Time to Maturity", weight: 0.03,
-    desc: "Portfolio sensitivity to rate movements",
+    name: "FirmSize", displayName: "Firm Size", weight: 0.03,
+    desc: "AUM scale, team experience, and operational infrastructure",
     criteria: [
-      "Weighted avg remaining mortgage debt term over 7 years; 100% fixed-rate; no renewals due within 36 months; well-staggered maturity schedule.",
-      "Weighted avg remaining debt term 5–7 years; predominantly fixed-rate; minimal near-term renewals; diversified lender base.",
-      "Weighted avg remaining debt term 3–5 years; mix of fixed and floating; some near-term renewals manageable in current rate environment.",
-      "Weighted avg remaining debt term 1–3 years; meaningful floating-rate exposure; material near-term renewals at higher rates; DSCR sensitive to rate reset.",
-      "Weighted avg remaining debt term under 1 year; primarily floating-rate or construction financing; immediate refinancing required; covenant breach risk.",
-    ],
-  },
-  {
-    name: "Derivatives OM", displayName: "Derivatives (allowable in OM)", weight: 0.02,
-    desc: "Derivative permissions under OM",
-    criteria: [
-      "OM explicitly prohibits all derivative instruments; no carve-outs.",
-      "OM permits derivatives only for liability hedging with strict notional limits.",
-      "OM permits standard hedging instruments; some discretionary use allowed within stated limits.",
-      "OM permits broad derivative use with limited restrictions; manager has significant discretion.",
-      "OM imposes no meaningful derivative restrictions; unconstrained speculative use permitted.",
-    ],
-  },
-  {
-    name: "VaR", displayName: "Value at Risk/ Drawdown", weight: 0.02,
-    desc: "Statistical value-at-risk exposure",
-    criteria: [
-      "Maximum historical NAV drawdown under 5%; estimated stress loss under 5% in a 20% property value correction; conservative leverage provides strong equity buffer.",
-      "Maximum historical drawdown 5–10%; estimated stress loss 5–10%; conservative leverage and diversification provide meaningful downside protection.",
-      "Maximum historical drawdown 10–20%; estimated stress loss 10–20%; moderate leverage and sector concentration expose fund to material downside in stress scenarios.",
-      "Maximum historical drawdown 20–30%; estimated stress loss 20–30%; elevated leverage amplifies asset value declines; concentrated positions intensify downside.",
-      "Maximum historical drawdown over 30% or equity impairment risk in a 20%+ property value correction at current LTV; development-stage assets with no income floor.",
-    ],
-  },
-  {
-    name: "Firm AUM", displayName: "Firm AUM", weight: 0.02,
-    desc: "Manager scale and organizational stability",
-    criteria: [
-      "Firm AUM over $5B; deep institutional investment, operations, and compliance teams; established lender relationships; robust infrastructure.",
-      "Firm AUM $1B–$5B; established multi-fund platform; experienced team; solid operational and compliance capacity.",
-      "Firm AUM $500M–$1B; single or dual-fund manager; adequate but not deep operational capacity; standard compliance and reporting infrastructure.",
-      "Firm AUM $100M–$500M; emerging manager; limited team depth; reliance on key individuals; growing but unproven operational infrastructure.",
-      "Firm AUM under $100M or experiencing rapid AUM change; single fund; minimal institutional infrastructure; operational viability risk.",
+      "Security is managed by a firm with very large and stable AUM (e.g., >$20B), a highly experienced multi cycle investment team, and deep, institutional grade operational and compliance infrastructure. Scale supports specialist teams, redundancy across functions, and robust governance. The firm demonstrates long term AUM stability across cycles and maintains strong operational continuity even under stress.",
+      "Security is managed by a firm with meaningful AUM (e.g., $5–20B), a capable and experienced team, and solid operational and compliance resources. The firm benefits from scale, but may not have the depth of the largest institutions. Team experience is strong, with adequate bench strength and specialization. Operational and compliance functions are reliable, though not as extensive or redundant as those of very large managers.",
+      "Security is managed by a firm with moderate AUM (e.g., $1–5B), adequate but uneven team experience, and functional but limited operational and compliance capacity. Scale benefits exist, but are modest. The team may be stretched across multiple mandates, and experience may be concentrated among a few senior individuals. Operational and compliance functions are sufficient for day to day needs, but may lack depth, automation, or redundancy.",
+      "Security is managed by a firm with small or volatile AUM (e.g., $250M–$1B), limited team depth, and constrained operational and compliance capacity. The team may have uneven experience or limited multi cycle exposure, and it may rely heavily on a small number of key individuals. Operational and compliance functions may be thin, manual, or reactive, increasing execution and oversight risk.",
+      "Security is managed by a firm with very small, declining, or unstable AUM (e.g., < $250M), minimal team experience or depth, and weak operational and compliance infrastructure. The firm may lack the resources to maintain robust governance, risk management, or oversight, and may be vulnerable to business continuity issues or key person departures. Operational and compliance functions may be under resourced, informal, or unable to support the demands of the strategy.",
     ],
   },
   {
     name: "Distribution", displayName: "Breadth of Distribution", weight: 0.02,
-    desc: "Sustainability of stated distribution yield",
+    desc: "Channel diversification, dealer network breadth, and affiliated dependency",
     criteria: [
-      "Distributed through 10 or more independent registered dealers across EMD, MFDA, and CIRO categories; broad and diverse advisor population; multiple independent suitability assessments.",
-      "5–10 independent or mixed affiliated and independent dealers; meaningful distribution breadth; reasonable advisor diversity; adequate independent suitability oversight.",
-      "2–5 dealers; mix of affiliated and independent; moderate distribution concentration; some independent suitability oversight present.",
-      "Primarily 1–2 affiliated dealers; limited independent suitability oversight; correlated redemption pressure risk from a concentrated and likely homogeneous client base.",
-      "Exclusively affiliated dealer; no independent suitability assessment; complete conflict of interest between fund manager and distribution channel; maximum correlated redemption pressure risk.",
+      "Security is supported by a manager with broad, multi channel distribution, a large and diversified dealer network, very low investor concentration, and minimal reliance on affiliated distribution. The fund is accessible through numerous independent channels and dealer groups. No single platform or investor type represents a material share of assets. Affiliated distribution, if present, is immaterial and does not influence platform dependency.",
+      "Security is supported by a manager with several strong distribution channels, a moderately diversified dealer network, manageable investor concentration, and limited but present affiliated distribution. A few channels or dealers may represent a meaningful share of assets, but no single source dominates. Affiliated distribution may contribute to flows, but does not materially drive them.",
+      "Security is supported by a manager with moderate distribution reach, a limited number of active dealers, noticeable investor concentration, and meaningful reliance on affiliated distribution. A small number of channels or dealer groups may account for a significant portion of assets. Affiliated distribution may represent a material share of flows, increasing platform dependency.",
+      "Security is supported by a manager with narrow distribution, few active dealers, high investor concentration, and heavy reliance on affiliated distribution. One or two channels, dealer groups, or affiliated platforms may dominate asset flows. This creates elevated dependency on a small number of relationships or internal channels.",
+      "Security is supported by a manager with very limited distribution, minimal dealer coverage, extreme investor concentration, and near total reliance on affiliated distribution. The fund may depend on a single dealer, a single platform, or an affiliated channel for the majority of assets. This creates significant vulnerability to platform decisions, internal channel changes, or investor behaviour.",
     ],
   },
   {
-    name: "FX Hedging", displayName: "Hedging Currency (actual use)", weight: 0.02,
-    desc: "Currency risk mitigation in place",
+    name: "HedgingCurrency", displayName: "Hedging Currency", weight: 0.01,
+    desc: "FX hedging instrument permissions and actual use",
     criteria: [
-      "100% of foreign currency exposures hedged with rolling FX forwards; hedge effectiveness consistently above 95%; minimal residual currency risk.",
-      "Predominantly hedged (80–100%); short-term gaps managed; hedging program well-documented and consistently executed.",
-      "Partially hedged (40–80%); some currency exposure accepted as a matter of policy; hedging reviewed periodically.",
-      "Lightly hedged (under 40%); material unhedged foreign currency exposure; ad hoc hedging approach.",
-      "No currency hedging in place; full FX risk passed to investors; fund with material foreign asset exposure and no mitigation.",
+      "A Low Hedging Currency Risk security has offering documents that permit only plain vanilla hedging instruments such as forwards or simple swaps and restrict their use solely to risk mitigation. Tactical positioning, speculative FX exposure, synthetic leverage, or over-hedging are prohibited. Maximum hedging ratios are typically capped at or near 100 percent. Actual use is minimal, transparent, and directly tied to underlying exposures. Hedging positions closely match the risks being mitigated.",
+      "A Low Medium Hedging Currency Risk security allows derivatives primarily for hedging, but includes limited flexibility for tactical or operational purposes. Offering documents may permit simple interest rate or currency derivatives beyond pure hedging, but still prohibit speculative positions or material leverage creation. Actual use is mostly hedging oriented, though occasional tactical adjustments may introduce small, manageable exposure variability. Hedging remains aligned with underlying exposures and does not materially alter the portfolio's FX profile.",
+      "A Medium Hedging Currency Risk security has broader derivative permissions that allow both hedging and selective use of derivatives for portfolio management or tactical positioning. Offering documents may permit derivatives that can introduce moderate leverage or alter exposures, provided they remain within defined limits. Actual use includes hedging, but also tactical rate positioning, partial exposure shifts, or opportunistic adjustments that may imperfectly align with underlying risks.",
+      "A Medium High Hedging Currency Risk security has wide derivative permissions that allow meaningful flexibility in using derivatives for leverage, exposure modification, or return enhancement. Offering documents may permit complex structures, synthetic exposures, or derivatives that can materially alter the fund's risk profile. Actual use may include large or layered positions that amplify interest rate, currency, or market sensitivity, with hedging overshadowed by exposure enhancing strategies.",
+      "A High Hedging Currency Risk security has very broad or loosely defined derivative permissions, allowing extensive use of derivatives for leverage, speculation, or exposure transformation. Offering documents may permit complex, leveraged, or synthetic derivative strategies with minimal constraints, enabling significant risk amplification. Actual use may include aggressive directional positions, significant leverage creation, or derivative structures that materially reshape the fund's economic exposure beyond its underlying assets.",
     ],
   },
   {
-    name: "FX OM", displayName: "Hedging Currency (allowable in OM)", weight: 0.01,
-    desc: "FX exposure permitted under OM",
+    name: "Derivatives", displayName: "Derivatives", weight: 0.01,
+    desc: "Derivative permissions and actual use for hedging vs. leverage/speculation",
     criteria: [
-      "OM restricts fund to domestic assets only; no foreign currency exposure permitted.",
-      "OM permits limited foreign exposure (under 10%); mandatory hedging required.",
-      "OM permits moderate foreign exposure (10–30%); hedging encouraged but not mandatory.",
-      "OM permits significant foreign exposure (30–60%); limited hedging requirements.",
-      "OM permits unrestricted foreign exposure; no hedging requirements; broad manager discretion on currency risk.",
+      "The security has highly restrictive offering documents that permit only plain vanilla hedging instruments such as interest-rate swaps, caps, or FX forwards. Derivatives cannot be used for leverage, speculation, or exposure modification. Actual use is minimal, transparent, and directly tied to underlying exposures, with no synthetic positions or leverage creation. Derivative positions closely match the risks being hedged, and the program is consistently applied.",
+      "The security allows derivatives primarily for hedging, but includes limited flexibility for tactical or operational purposes. Offering documents may permit simple interest rate or currency derivatives beyond pure hedging, but still prohibit speculative positions or material leverage creation. Actual use is mostly hedging oriented, though occasional tactical adjustments may introduce small, manageable exposure variability.",
+      "The security has broader permissions that allow both hedging and selective use of derivatives for portfolio management or tactical positioning. Offering documents may permit derivatives that can introduce moderate leverage or alter exposures within defined limits. Actual use includes hedging, but also tactical rate positioning, partial exposure shifts, or opportunistic adjustments that may imperfectly align with underlying risks.",
+      "The security has wide derivative permissions that allow meaningful flexibility to use derivatives for leverage, exposure modification, or return enhancement. Offering documents may permit complex structures, synthetic exposures, or derivatives that can materially alter the fund's risk profile. Actual use may include large or layered positions that amplify interest rate, currency, or market sensitivity, with hedging overshadowed by exposure enhancing strategies.",
+      "The security has very broad or loosely defined derivative permissions, allowing extensive use of derivatives for leverage, speculation, or exposure transformation. Offering documents may permit complex, leveraged, or synthetic strategies with minimal constraints. Actual use may include aggressive directional positions, significant leverage creation, or derivative structures that materially reshape the fund's economic exposure beyond its underlying assets.",
     ],
   },
 ];
 
-const STRUCTURE_SENSITIVE = new Set([
-  "Liquidity", "Concentration", "Time Horizon", "Asset Class",
-  "Leverage Actual", "Development", "Return Variability", "Leverage OM",
-  "Interest Rate", "VaR", "Derivatives Actual", "Derivatives OM",
-]);
+// No structure-sensitive dual scoring for Equity; will be defined when Debt/Hybrid factor sets are added
+const STRUCTURE_SENSITIVE = new Set([]);
 
 // Factors excluded from the scoring model by fund type (still shown in config panel)
 const FUND_TYPE_MODEL_EXCLUSIONS = {
@@ -251,105 +215,90 @@ const EQ = {
 
 // Compliance-oriented exclusion rationales per factor (primary first, then alternatives)
 const EXCLUSION_REASONS = {
+  "PriceDiscovery": [
+    "Excluded because valuation methodology is externally supported, independently governed, and considered sufficiently robust to obviate a standalone pricing-risk score.",
+    "Independent appraisal process and valuation committee oversight reduce the need for separate pricing-risk weighting.",
+    "NAV methodology assessed independently through due diligence review; factor does not materially differentiate this product within the peer group.",
+  ],
   "Liquidity": [
-    "Liquidity risk deemed non-primary for this mandate based on intended long-term holding profile.",
+    "Liquidity risk deemed non-primary for this mandate based on the intended long-term holding profile and absence of redemption pressure.",
     "Excluded because liquidity characteristics are already captured through product structure, client suitability review, and redemption policy analysis elsewhere in the assessment.",
     "Excluded due to limited material differentiation across comparable products under review.",
   ],
-  "Concentration": [
-    "Excluded because concentration exposure is already incorporated within broader portfolio construction and issuer diversification oversight.",
-    "Single-sector concentration is intentional and inherent to the mandate.",
-    "Concentration risk assessed separately at the portfolio-allocation level.",
+  "Leverage": [
+    "Excluded because current leverage levels are temporary, transitional, or expected to fluctuate materially, making a point-in-time score unreliable.",
+    "Leverage assessed through covenant, structural, and offering document review outside the quantitative scoring framework.",
+    "Offering document leverage constraints and actual operating leverage are sufficiently conservative to render differentiated scoring immaterial.",
   ],
-  "Time Horizon": [
-    "Excluded because client-specific holding period suitability is assessed independently from product-level risk scoring.",
-    "Time horizon considerations addressed through KYC and IPS process.",
-    "Criterion removed to avoid duplication with suitability review.",
-  ],
-  "Asset Class": [
-    "Excluded because the product universe under review shares substantially similar asset-class characteristics.",
-    "Asset class risk considered baseline and non-differentiating for this category.",
-    "Underlying asset exposure already reflected in other active factors.",
-  ],
-  "Track Record": [
-    "Excluded due to limited relevance for newly launched or restructured products where historical comparability is constrained.",
-    "Track record deemed non-representative of current strategy composition.",
-    "Historical performance not relied upon as a primary risk determinant.",
-  ],
-  "Mandate Scope": [
-    "Excluded because OM flexibility is narrow and not considered a material risk driver for this product.",
-    "Mandate constraints sufficiently addressed through compliance oversight.",
-    "Scope discretion assessed as immaterial relative to core portfolio risks.",
-  ],
-  "Leverage Actual": [
-    "Excluded because current leverage levels are temporary, transitional, or expected to fluctuate materially.",
-    "Current leverage not considered representative of long-term operating profile.",
-    "Leverage assessed through covenant and structural review elsewhere.",
-  ],
-  "Development": [
-    "Excluded because the fund has no meaningful active development exposure at the time of assessment.",
-    "Criterion excluded due to de minimis construction and entitlement risk.",
-    "Development exposure not material to current portfolio composition.",
-  ],
-  "Return Variability": [
-    "Excluded because historical distribution consistency is not a primary determinant of forward-looking product risk.",
-    "Insufficient operating history to produce meaningful variability analysis.",
-    "Return volatility assessed indirectly through leverage and asset quality metrics.",
-  ],
-  "Manager Discipline": [
-    "Excluded because governance and mandate adherence are reviewed qualitatively through separate due diligence procedures.",
-    "No evidence of style drift or mandate deviation requiring differentiated scoring.",
-    "Governance oversight assessed outside the quantitative framework.",
-  ],
-  "Leverage OM": [
-    "Excluded because maximum permitted leverage materially exceeds expected operating leverage and is not viewed as reflective of actual practice.",
-    "OM leverage ceiling considered theoretical rather than operational.",
-    "Actual leverage metrics deemed more relevant than permitted limits.",
-  ],
-  "Derivatives Actual": [
-    "Excluded because the fund currently does not utilize derivative instruments in a material capacity.",
-    "Derivative exposure immaterial to overall risk profile.",
-    "No active derivative strategy requiring standalone assessment.",
-  ],
-  "Pricing Risk": [
-    "Excluded because valuation methodology is externally supported and considered sufficiently robust.",
-    "Independent appraisal process reduces need for separate pricing-risk weighting.",
-    "NAV methodology assessed independently through due diligence review.",
-  ],
-  "Interest Rate": [
-    "Excluded because interest-rate exposure is already embedded within leverage and debt maturity analysis.",
-    "Interest-rate risk considered secondary to broader real estate fundamentals.",
-    "Criterion removed to reduce overlap with financing structure review.",
-  ],
-  "Derivatives OM": [
-    "Excluded because the OM permits only limited or non-material derivative usage.",
-    "Derivative permissions considered standard and non-differentiating.",
-    "No practical expectation of speculative derivative utilization.",
+  "InterestRate": [
+    "Excluded because interest-rate exposure is already embedded within the leverage and drawdown risk assessments.",
+    "Interest-rate risk considered secondary to broader fundamental drivers for this product at the time of assessment.",
+    "Criterion removed to reduce overlap with financing structure and duration analysis conducted separately.",
   ],
   "VaR": [
-    "Excluded because statistical VaR models are considered unreliable for illiquid private-market assets.",
-    "Historical volatility data insufficient for meaningful VaR calibration.",
-    "Scenario-based stress testing preferred over quantitative VaR metrics.",
+    "Excluded because statistical drawdown models are considered unreliable or unavailable for illiquid or early-stage private-market assets.",
+    "Insufficient performance history to produce a meaningful drawdown or VaR assessment.",
+    "Scenario-based stress testing preferred over quantitative VaR metrics for this asset class; factor assessed qualitatively through separate due diligence.",
   ],
-  "Firm AUM": [
-    "Excluded because organizational scale is not viewed as a direct proxy for product-level risk.",
-    "Manager size deemed secondary to asset quality and governance.",
-    "AUM not considered materially differentiating within peer group.",
+  "Concentration": [
+    "Excluded because concentration exposure is already incorporated within broader portfolio construction and issuer diversification oversight.",
+    "Single-sector or single-strategy concentration is intentional and inherent to the mandate; the factor does not add discriminatory value.",
+    "Concentration risk assessed separately at the portfolio-allocation level and does not require a standalone product-level score.",
+  ],
+  "MandateScope": [
+    "Excluded because the offering documents impose narrow investment restrictions and the fund's actual non-core exposure is negligible.",
+    "Mandate scope risk assessed as immaterial relative to core portfolio risks; OM constraints are sufficiently tight.",
+    "Non-core asset exposure is de minimis and fully disclosed; no material discretion exists to alter the product's risk profile.",
+  ],
+  "ReturnVariability": [
+    "Excluded because historical distribution consistency is not a primary determinant of forward-looking product risk for this mandate.",
+    "Insufficient operating history to produce a meaningful return variability analysis.",
+    "Distribution and NAV volatility assessed indirectly through leverage, drawdown, and asset quality metrics already included in the model.",
+  ],
+  "TimeHorizon": [
+    "Excluded because client-specific holding period suitability is assessed independently from product-level risk scoring through the KYC and IPS process.",
+    "Time horizon considerations addressed through client suitability review; the product's lock-up terms are consistent with its peer group and do not require differentiated scoring.",
+    "Criterion removed to avoid duplication with suitability review conducted at the account level.",
+  ],
+  "ManagerDiscipline": [
+    "Excluded because governance and mandate adherence are reviewed qualitatively through separate due diligence procedures and do not require a standalone quantitative score.",
+    "No evidence of style drift, mandate deviation, or risk control deficiencies requiring differentiated scoring at this time.",
+    "Manager discipline assessed outside the quantitative framework; scoring would not add discriminatory value for this product.",
+  ],
+  "Governance": [
+    "Excluded because the fund operates under a clearly defined regulatory framework and governance structure that is consistent with the peer group and does not require differentiated scoring.",
+    "Regulatory and governance risk assessed through qualitative due diligence review; factor does not materially differentiate this product.",
+    "Independent oversight, reporting standards, and conflict management are adequate; standalone scoring is not warranted.",
+  ],
+  "TrackRecord": [
+    "Excluded due to limited relevance for newly launched or restructured products where historical comparability is constrained.",
+    "Track record deemed non-representative of the current strategy composition or team; historical performance not relied upon as a primary risk determinant.",
+    "Manager's performance history assessed separately through qualitative due diligence; quantitative track record scoring not applicable.",
+  ],
+  "KeyPerson": [
+    "Excluded because the organization demonstrates adequate team depth, succession planning, and institutional retention structures that reduce key person dependency to an immaterial level.",
+    "Key person risk assessed qualitatively through separate due diligence; factor does not materially differentiate this product within the peer group.",
+    "Decision making is sufficiently distributed and the team is stable; standalone scoring is not warranted at this time.",
+  ],
+  "FirmSize": [
+    "Excluded because organizational scale is not viewed as a direct proxy for product-level risk for this mandate.",
+    "Manager size deemed secondary to asset quality, governance, and team experience; AUM is not considered materially differentiating within the peer group.",
+    "Firm AUM and operational capacity assessed through separate due diligence; factor does not add discriminatory value.",
   ],
   "Distribution": [
     "Excluded because dealer concentration risk is monitored separately through compliance and redemption oversight.",
-    "Distribution structure not considered a material determinant of underlying investment risk.",
-    "Criterion excluded to avoid overlap with conflict-of-interest review.",
+    "Distribution structure not considered a material determinant of underlying investment risk for this product.",
+    "Criterion excluded to avoid overlap with conflict-of-interest review conducted at the firm level.",
   ],
-  "FX Hedging": [
-    "Excluded because the fund has no material foreign currency exposure.",
-    "Currency fluctuations immaterial to expected return profile.",
-    "FX risk negligible due to predominantly domestic asset base.",
+  "HedgingCurrency": [
+    "Excluded because the fund has no material foreign currency exposure and hedging is not applicable.",
+    "Currency fluctuations are immaterial to the expected return profile given the fund's predominantly domestic asset base.",
+    "FX risk is negligible; offering document restrictions on foreign exposure are sufficiently narrow to render separate scoring unnecessary.",
   ],
-  "FX OM": [
-    "Excluded because the OM permits minimal or no meaningful foreign currency exposure.",
-    "Foreign currency flexibility considered non-core to the mandate.",
-    "FX exposure constraints sufficiently narrow to render separate scoring unnecessary.",
+  "Derivatives": [
+    "Excluded because the fund does not currently utilize derivative instruments in a material capacity and the offering documents impose restrictive limits.",
+    "Derivative exposure is immaterial to the overall risk profile; no active derivative strategy requires standalone assessment.",
+    "Derivative permissions are standard and non-differentiating within the peer group; no practical expectation of speculative utilization.",
   ],
 };
 
@@ -359,18 +308,16 @@ const FACTOR_GROUPS = [
   {
     col: "left",
     groups: [
-      { label: "Core Structural",        factors: ["Liquidity", "Concentration", "Time Horizon"] },
-      { label: "Portfolio & Strategy",   factors: ["Asset Class", "Track Record", "Mandate Scope", "Development", "Return Variability"] },
-      { label: "Leverage",               factors: ["Leverage Actual", "Leverage OM"] },
-      { label: "Management & Governance",factors: ["Manager Discipline", "Pricing Risk", "Firm AUM", "Distribution"] },
+      { label: "Market & Valuation Risk",  factors: ["PriceDiscovery", "Liquidity", "VaR"] },
+      { label: "Portfolio Construction",   factors: ["Concentration", "MandateScope", "ReturnVariability", "TimeHorizon"] },
+      { label: "Governance & Distribution",factors: ["Governance", "Distribution"] },
     ],
   },
   {
     col: "right",
     groups: [
-      { label: "Market Risk",      factors: ["Interest Rate", "VaR"] },
-      { label: "Derivatives",      factors: ["Derivatives Actual", "Derivatives OM"] },
-      { label: "Currency Hedging", factors: ["FX Hedging", "FX OM"] },
+      { label: "Capital Structure",      factors: ["Leverage", "InterestRate", "Derivatives", "HedgingCurrency"] },
+      { label: "Manager & Firm Quality", factors: ["ManagerDiscipline", "TrackRecord", "KeyPerson", "FirmSize"] },
     ],
   },
 ];
@@ -554,11 +501,7 @@ export default function App() {
   // Factors that auto-exclude by fund type (with pre-set reasons)
   const FUND_TYPE_EXCLUSIONS = {
     Equity: {},
-    Debt: {
-      "Development":        "Excluded — development/construction exposure is not applicable to a debt fund structure; assessed via loan underwriting criteria instead.",
-      "Return Variability":  "Excluded — distribution variability analysis not applicable; income stability assessed through interest coverage and covenant compliance.",
-      "Mandate Scope":      "Excluded — mandate scope assessed through loan origination policy and credit underwriting standards rather than equity investment breadth.",
-    },
+    Debt:   {},
     Hybrid: {},
   };
 
@@ -797,11 +740,11 @@ export default function App() {
 <div style="background:#2e3a55;padding:20px 28px;border-bottom:4px solid #c9a020;">
   <div style="display:flex;justify-content:space-between;align-items:flex-start;">
     <div>
-      <div style="font-size:9px;letter-spacing:.18em;color:#c9a020;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Equiton Capital — Know Your Product (KYP) Risk Assessment</div>
+      <div style="font-size:9px;letter-spacing:.18em;color:#c9a020;text-transform:uppercase;font-weight:700;margin-bottom:6px;">Assurican Private Wealth — Know Your Product (KYP) Risk Assessment</div>
       <div style="font-size:22px;font-weight:800;color:#ffffff;">${fund || "Unnamed Fund"}</div>
       <div style="font-size:11px;color:#c8ccd8;margin-top:4px;">
         <span style="background:#c9a020;color:#2e3a55;padding:1px 8px;border-radius:3px;font-weight:700;font-size:10px;margin-right:8px;">${fundType} Fund${fundType === "Hybrid" ? ` — ${hybridSplit}% Equity / ${100 - hybridSplit}% Debt` : ""}</span>
-        20-Factor Composite Risk Score Model &nbsp;|&nbsp; Version 3.0
+        17-Factor Composite Risk Score Model — Equity &nbsp;|&nbsp; Version 1.0
       </div>
     </div>
     <div style="text-align:right;">
@@ -881,10 +824,10 @@ export default function App() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, borderBottom: `3px solid ${EQ.gold}`, paddingBottom: 0 }}>
           <div style={{ padding: "18px 0 14px" }}>
             <div style={{ fontSize: 21, fontWeight: 700, color: "#ffffff" }}>
-              Private Real Estate Fund — Composite Risk Score Model
+              Product Risk Assessment — Composite Risk Score Model
             </div>
             <div style={{ fontSize: 13, color: "#ffffff", marginTop: 4, opacity: 0.85 }}>
-              20-Factor KYP Assessment Framework Version 4.0
+              17-Factor KYP Assessment Framework — Equity (Version 1.0)
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 24, padding: "18px 0 14px" }}>
@@ -1197,7 +1140,7 @@ export default function App() {
                   <div style={{ marginTop: 10, display: "flex", gap: 6, alignItems: "flex-start" }}>
                     <span style={{ fontSize: 11, color: EQ.textMuted, flexShrink: 0 }}>ⓘ</span>
                     <span style={{ fontSize: 11, color: EQ.textMuted, lineHeight: 1.5 }}>
-                      12 structure-sensitive factors scored separately per component; blended using this split. 8 fund-level factors use a single score.
+                      Hybrid scoring will be configured when the Debt factor set is added. Scores currently reflect Equity factor definitions.
                     </span>
                   </div>
                 </div>
