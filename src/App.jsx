@@ -438,12 +438,12 @@ function CriteriaTable({ criteria, selectedScore }) {
               key={v}
               style={{
                 background: isSelected ? tc.bg : "transparent",
-                borderTop: "1px solid #e8eaef",
+                borderTop: "1px solid var(--border)",
               }}
             >
-              <td style={{ padding: "7px 10px", fontWeight: isSelected ? 700 : 400, color: isSelected ? tc.color : "#666", verticalAlign: "top" }}>{v}</td>
-              <td style={{ padding: "7px 10px", fontWeight: isSelected ? 700 : 400, color: isSelected ? tc.color : "#888", verticalAlign: "top", whiteSpace: "nowrap" }}>{tc.label}</td>
-              <td style={{ padding: "7px 10px", fontWeight: isSelected ? 600 : 400, color: isSelected ? "#1a1a1a" : "#555", verticalAlign: "top", lineHeight: 1.5 }}>{criteria[v - 1]}</td>
+              <td style={{ padding: "7px 10px", fontWeight: isSelected ? 700 : 400, color: isSelected ? tc.color : "var(--text-mid)", verticalAlign: "top" }}>{v}</td>
+              <td style={{ padding: "7px 10px", fontWeight: isSelected ? 700 : 400, color: isSelected ? tc.color : "var(--text-mid)", verticalAlign: "top", whiteSpace: "nowrap" }}>{tc.label}</td>
+              <td style={{ padding: "7px 10px", fontWeight: isSelected ? 600 : 400, color: isSelected ? "var(--text)" : "var(--text-mid)", verticalAlign: "top", lineHeight: 1.5 }}>{criteria[v - 1]}</td>
             </tr>
           );
         })}
@@ -1009,7 +1009,7 @@ export default function App() {
                     <div key={f.name} style={{ padding: "3px 0", borderBottom: i < scoringContribs.length - 1 ? "1px solid var(--border)" : "none", opacity: f.isOn ? 1 : 0.35 }}>
                       <div style={{ display: "grid", gridTemplateColumns: cols, gap: 3, alignItems: "center" }}>
                         <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-nav)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{f.displayName}</span>
-                        <span style={{ fontSize: 12, color: "var(--text-muted2)", textAlign: "right", fontFamily: "monospace" }}>{(f.weight * 100).toFixed(0)}%</span>
+                        <span style={{ fontSize: 12, color: "var(--text-mid)", textAlign: "right", fontFamily: "monospace" }}>{(f.weight * 100).toFixed(0)}%</span>
                         {weightsNormalized && (
                           <span style={{ fontSize: 12, color: f.isOn && f.isComplete ? EQ.gold : "var(--text-muted)", textAlign: "right", fontFamily: "monospace", fontWeight: f.isOn && f.isComplete ? 700 : 400 }}>
                             {f.isOn && f.isComplete ? (f.effectiveWeight * 100).toFixed(1) + "%" : "—"}
@@ -1275,7 +1275,7 @@ export default function App() {
                                     <span style={{ fontSize: 14, color: isOn ? "var(--text-nav-dark)" : "var(--text-muted)", fontWeight: 700, lineHeight: 1.3, display: "block" }}>
                                       {f.displayName || f.name}
                                     </span>
-                                    <span style={{ fontSize: 11, color: "var(--text-muted2)" }}>({(f.weight * 100).toFixed(0)}% base)</span>
+                                    <span style={{ fontSize: 11, color: "var(--text-mid)" }}>({(f.weight * 100).toFixed(0)}% base)</span>
                                   </div>
                                   <Toggle on={isOn} onChange={val => toggleFactor(name, val)} />
                                 </div>
@@ -1392,7 +1392,7 @@ export default function App() {
                                 const isSelected = f.score === v;
                                 return (
                                   <button key={v} onClick={() => setScores(prev => ({ ...prev, [f.name]: v }))}
-                                    style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: "var(--radius-sm)", background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-muted)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
+                                    style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: "var(--radius-sm)", background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-mid)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
                                     {v} — {tc.label}
                                   </button>
                                 );
@@ -1411,7 +1411,7 @@ export default function App() {
                                 const isSelected = f.debtScore === v;
                                 return (
                                   <button key={v} onClick={() => setDebtScores(prev => ({ ...prev, [f.name]: v }))}
-                                    style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: "var(--radius-sm)", background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-muted)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
+                                    style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: "var(--radius-sm)", background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-mid)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
                                     {v} — {tc.label}
                                   </button>
                                 );
@@ -1426,7 +1426,7 @@ export default function App() {
                             const isSelected = f.score === v;
                             return (
                               <button key={v} onClick={() => setScores(prev => ({ ...prev, [f.name]: v }))}
-                                style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: "var(--radius-sm)", background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-muted)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
+                                style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: "var(--radius-sm)", background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-mid)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
                                 {v} — {tc.label}
                               </button>
                             );
