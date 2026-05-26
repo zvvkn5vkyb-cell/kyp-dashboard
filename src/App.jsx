@@ -851,21 +851,22 @@ export default function App() {
                 display: "flex",
                 alignItems: "center",
                 gap: 7,
-                background: "transparent",
-                color: "#ffffff",
-                border: `1px solid ${EQ.gold}60`,
+                background: darkMode ? "#000000" : "transparent",
+                color: darkMode ? "#FF6600" : "#ffffff",
+                border: darkMode ? "1px solid #FF6600" : `1px solid ${EQ.gold}60`,
                 borderRadius: 5,
                 padding: "10px 16px",
                 fontSize: 16,
                 fontFamily: "inherit",
                 cursor: "pointer",
-                transition: "opacity .15s ease",
+                transition: "all .2s ease",
                 lineHeight: 1,
+                boxShadow: darkMode ? "0 0 8px rgba(255,102,0,.35)" : "none",
               }}
-              onMouseOver={e => e.currentTarget.style.opacity = ".7"}
+              onMouseOver={e => e.currentTarget.style.opacity = ".8"}
               onMouseOut={e => e.currentTarget.style.opacity = "1"}
             >
-              {darkMode ? "☀" : "🌙"}
+              {darkMode ? "🌙" : "☀"}
             </button>
 
             {/* Reset button */}
