@@ -810,16 +810,16 @@ export default function App() {
   Active factors: ${activeContribs.length} / ${factors.length}. &nbsp; Report generated: ${new Date().toLocaleString("en-CA")}.
 </div>
 
-<script>
-  // Auto-open print dialog after a short delay for rendering
-  setTimeout(() => window.print(), 600);
-</script>
 </body>
 </html>`;
 
-    const w = window.open("", "_blank");
-    w.document.write(html);
-    w.document.close();
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const w = window.open(url, "_blank");
+    if (!w) {
+      alert("Popup blocked — please allow popups for this site and try again.");
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
   };
 
   return (
