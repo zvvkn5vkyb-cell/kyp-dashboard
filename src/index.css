@@ -1,8 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
 *, *::before, *::after { box-sizing: border-box; }
 body { margin: 0; }
 
-/* ── Light theme (default) ── */
+/* ── Light theme ── */
 :root {
+  --ui-font:       'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --num-font:      'Inter', monospace;
+  --header-bg:     #1e3a5f;
+  --card-header-bg:#1e3a5f;
+  --accent:        #c9a020;
+  --accent-text:   #1e3a5f;
+  --accent-glow:   rgba(201,160,32,.35);
+  --accent-dim:    rgba(201,160,32,.20);
+  --radius:        6px;
+  --radius-sm:     4px;
+  --radius-xs:     3px;
+  --shadow:        0 1px 4px rgba(46,58,85,.07);
+
   --app-bg:        #f4f5f8;
   --card-bg:       #ffffff;
   --card-alt:      #f9fafc;
@@ -32,33 +47,63 @@ body { margin: 0; }
   --tier5-color: #b02020; --tier5-bg: #fce8e8;
 }
 
-/* ── Dark theme ── */
+/* ── Bloomberg Terminal dark theme ── */
 :root.dark {
-  --app-bg:        #0f1623;
-  --card-bg:       #1a2540;
-  --card-alt:      #1e2d4a;
-  --card-alt2:     #1e2d4a;
-  --card-alt3:     #1a2540;
-  --disabled-bg:   #141e30;
-  --disabled-hdr:  #182030;
-  --border:        #253347;
-  --border-dark:   #2e4060;
-  --text:          #e0e8f5;
-  --text-strong:   #ccd8ec;
-  --text-mid:      #9ab0cc;
-  --text-light:    #8898aa;
-  --text-nav:      #c0d0e8;
-  --text-nav-dark: #b0c4df;
-  --text-muted:    #6a80a0;
-  --text-muted2:   #7a90aa;
-  --text-muted3:   #7a90aa;
-  --gold-light:    #2a2005;
-  --input-bg:      #141e30;
-  --gauge-track:   #1e2d4a;
+  --ui-font:       'IBM Plex Mono', 'Consolas', 'Courier New', monospace;
+  --num-font:      'IBM Plex Mono', 'Consolas', 'Courier New', monospace;
+  --header-bg:     #000000;
+  --card-header-bg:#111111;
+  --accent:        #FF6600;
+  --accent-text:   #000000;
+  --accent-glow:   rgba(255,102,0,.40);
+  --accent-dim:    rgba(255,102,0,.15);
+  --radius:        2px;
+  --radius-sm:     1px;
+  --radius-xs:     1px;
+  --shadow:        none;
 
-  --tier1-color: #4ade80; --tier1-bg: #0a2218;
-  --tier2-color: #86c453; --tier2-bg: #0d2010;
-  --tier3-color: #e6b820; --tier3-bg: #251d00;
-  --tier4-color: #f07840; --tier4-bg: #251000;
-  --tier5-color: #f06060; --tier5-bg: #250808;
+  --app-bg:        #000000;
+  --card-bg:       #0D0D0D;
+  --card-alt:      #111111;
+  --card-alt2:     #111111;
+  --card-alt3:     #0D0D0D;
+  --disabled-bg:   #080808;
+  --disabled-hdr:  #0D0D0D;
+  --border:        #222222;
+  --border-dark:   #333333;
+  --text:          #E8E8E8;
+  --text-strong:   #FFFFFF;
+  --text-mid:      #BBBBBB;
+  --text-light:    #999999;
+  --text-nav:      #FFFFFF;
+  --text-nav-dark: #EEEEEE;
+  --text-muted:    #555555;
+  --text-muted2:   #666666;
+  --text-muted3:   #555555;
+  --gold-light:    #1A0800;
+  --input-bg:      #080808;
+  --gauge-track:   #1A1A1A;
+
+  --tier1-color: #00CC44; --tier1-bg: #001A00;
+  --tier2-color: #AACC00; --tier2-bg: #111A00;
+  --tier3-color: #FFCC00; --tier3-bg: #1A1400;
+  --tier4-color: #FF6600; --tier4-bg: #1A0800;
+  --tier5-color: #FF2222; --tier5-bg: #1A0000;
+}
+
+/* Range input thumb — webkit */
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--app-bg);
+  cursor: pointer;
+}
+input[type=range]::-moz-range-thumb {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--app-bg);
+  cursor: pointer;
 }

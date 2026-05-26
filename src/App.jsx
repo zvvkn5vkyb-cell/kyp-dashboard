@@ -412,7 +412,7 @@ function GaugeArc({ crs }) {
       <text x={cx} y={cy + 38} textAnchor="middle" fontSize={30} fontWeight={700} fill={tier.color} fontFamily="Inter,Helvetica Neue,Arial,sans-serif">
         {score.toFixed(2)}
       </text>
-      <text x={cx} y={cy + 53} textAnchor="middle" fontSize={9} fill="#9aa0b0" fontFamily="sans-serif" letterSpacing="0.5">
+      <text x={cx} y={cy + 53} textAnchor="middle" fontSize={9} fill="var(--text-muted)" fontFamily="sans-serif" letterSpacing="0.5">
         OF 5.00
       </text>
     </svg>
@@ -423,7 +423,7 @@ function CriteriaTable({ criteria, selectedScore }) {
   return (
     <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 0, fontSize: 11, fontFamily: "sans-serif" }}>
       <thead>
-        <tr style={{ background: EQ.navy }}>
+        <tr style={{ background: "var(--card-header-bg)" }}>
           <th style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: "#ffffff", fontSize: 10, letterSpacing: ".08em", width: 52 }}>SCORE</th>
           <th style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: "#ffffff", fontSize: 10, letterSpacing: ".08em", width: 70 }}>TIER</th>
           <th style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: "#ffffff", fontSize: 10, letterSpacing: ".08em" }}>CRITERIA</th>
@@ -480,7 +480,7 @@ function Toggle({ on, onChange }) {
         borderRadius: "50%",
         background: "#fff",
         transition: "left .2s ease",
-        boxShadow: "0 1px 3px rgba(0,0,0,.25)",
+        boxShadow: "0 1px 3px rgba(0,0,0,.5)",
       }} />
     </button>
   );
@@ -497,7 +497,7 @@ export default function App() {
   const [hybridSplit,  setHybridSplit] = useState(65); // equity %
   const [openCriteria, setOpenCriteria] = useState(new Set());
   const [collapsedGroups, setCollapsedGroups] = useState(new Set());
-  const [darkMode,     setDarkMode]    = useState(() => localStorage.getItem("kyp-theme") === "dark");
+  const [darkMode,     setDarkMode]    = useState(() => localStorage.getItem("kyp-theme") !== "light");
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
@@ -823,10 +823,10 @@ export default function App() {
   };
 
   return (
-    <div style={{ fontFamily: "'Inter','Helvetica Neue',Arial,sans-serif", background: "var(--app-bg)", minHeight: "100vh", color: "var(--text)" }}>
+    <div style={{ fontFamily: "var(--ui-font)", background: "var(--app-bg)", minHeight: "100vh", color: "var(--text)" }}>
 
       {/* ── Header ── */}
-      <div style={{ background: "#1e3a5f", padding: "0 32px" }}>
+      <div style={{ background: "var(--header-bg)", padding: "0 32px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, borderBottom: `3px solid ${EQ.gold}`, paddingBottom: 0 }}>
           <div style={{ padding: "18px 0 14px" }}>
             <div style={{ fontSize: 21, fontWeight: 700, color: "#ffffff" }}>
@@ -838,7 +838,7 @@ export default function App() {
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 24, padding: "18px 0 14px" }}>
             {/* Date + factor count */}
-            <div style={{ textAlign: "right", borderRight: `1px solid ${EQ.gold}30`, paddingRight: 24 }}>
+            <div style={{ textAlign: "right", borderRight: "1px solid var(--accent-dim)", paddingRight: 24 }}>
               <div style={{ fontSize: 9, color: "#ffffff", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 2, opacity: 0.85 }}>Assessment Date</div>
               <div style={{ fontSize: 13, color: "#ffffff", fontWeight: 600 }}>{today}</div>
               <div style={{ fontSize: 9, color: "var(--text-muted)", marginTop: 3 }}>{activeContribs.length} of {factors.length} factors active</div>
@@ -853,8 +853,8 @@ export default function App() {
                 gap: 7,
                 background: darkMode ? "#000000" : "transparent",
                 color: darkMode ? "#FF6600" : "#ffffff",
-                border: darkMode ? "1px solid #FF6600" : `1px solid ${EQ.gold}60`,
-                borderRadius: 5,
+                border: darkMode ? "1px solid #FF6600" : "1px solid var(--accent-dim)",
+                borderRadius: "var(--radius)",
                 padding: "10px 16px",
                 fontSize: 16,
                 fontFamily: "inherit",
@@ -878,8 +878,8 @@ export default function App() {
                 gap: 7,
                 background: "transparent",
                 color: "#ffffff",
-                border: `1px solid ${EQ.gold}60`,
-                borderRadius: 5,
+                border: "1px solid var(--accent-dim)",
+                borderRadius: "var(--radius)",
                 padding: "10px 20px",
                 fontSize: 12,
                 fontWeight: 700,
@@ -902,10 +902,10 @@ export default function App() {
                 display: "flex",
                 alignItems: "center",
                 gap: 7,
-                background: EQ.gold,
-                color: "var(--text-nav)",
+                background: "var(--accent)",
+                color: "var(--accent-text)",
                 border: "none",
-                borderRadius: 5,
+                borderRadius: "var(--radius)",
                 padding: "10px 20px",
                 fontSize: 12,
                 fontWeight: 800,
@@ -914,7 +914,7 @@ export default function App() {
                 letterSpacing: ".06em",
                 textTransform: "uppercase",
                 whiteSpace: "nowrap",
-                boxShadow: "0 2px 8px rgba(201,160,32,.35)",
+                boxShadow: "0 2px 8px var(--accent-glow)",
                 transition: "opacity .15s ease",
               }}
               onMouseOver={e => e.currentTarget.style.opacity = ".85"}
@@ -931,23 +931,23 @@ export default function App() {
         {/* ── Left Panel ── */}
         <div>
           {/* Gauge card */}
-          <div style={{ background: "var(--card-bg)", borderRadius: 6, border: "1px solid var(--border)", padding: "16px 12px 12px", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
+          <div style={{ background: "var(--card-bg)", borderRadius: "var(--radius)", border: "1px solid var(--border)", padding: "16px 12px 12px", boxShadow: "var(--shadow)" }}>
             <GaugeArc crs={CRS} />
-            <div style={{ marginTop: 10, padding: "10px 14px", background: tier.bg, borderRadius: 5, border: `1px solid ${tier.color}33`, textAlign: "center" }}>
+            <div style={{ marginTop: 10, padding: "10px 14px", background: tier.bg, borderRadius: "var(--radius)", border: `1px solid ${tier.color}33`, textAlign: "center" }}>
               <div style={{ fontSize: 15, fontWeight: 700, color: tier.color }}>{tier.label}</div>
               <div style={{ fontSize: 11, color: tier.color, opacity: 0.8, marginTop: 2 }}>CRS: {CRS.toFixed(2)} / 5.00</div>
             </div>
           </div>
 
           {/* Top Risk Drivers */}
-          <div style={{ marginTop: 16, background: "var(--card-bg)", borderRadius: 6, border: "1px solid var(--border)", overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
-            <div style={{ background: EQ.navy, padding: "8px 14px" }}>
+          <div style={{ marginTop: 16, background: "var(--card-bg)", borderRadius: "var(--radius)", border: "1px solid var(--border)", overflow: "hidden", boxShadow: "var(--shadow)" }}>
+            <div style={{ background: "var(--card-header-bg)", padding: "8px 14px" }}>
               <span style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Top Risk Drivers</span>
             </div>
             <div style={{ padding: "12px 14px" }}>
               {top5.map((f, i) => (
                 <div key={f.name} style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: i < 4 ? 9 : 0, paddingBottom: i < 4 ? 9 : 0, borderBottom: i < 4 ? "1px solid var(--border)" : "none" }}>
-                  <div style={{ width: 20, height: 20, borderRadius: "50%", background: EQ.navy, border: `2px solid ${EQ.gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: EQ.gold, fontWeight: 800, flexShrink: 0 }}>{i + 1}</div>
+                  <div style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--card-header-bg)", border: `2px solid ${EQ.gold}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: EQ.gold, fontWeight: 800, flexShrink: 0 }}>{i + 1}</div>
                   <div style={{ flex: 1, fontSize: 12, fontWeight: 500, color: "var(--text-nav)" }}>{f.name}</div>
                   <div style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "sans-serif" }}>{f.contrib.toFixed(3)}</div>
                 </div>
@@ -956,8 +956,8 @@ export default function App() {
           </div>
 
           {/* Risk Tier Reference */}
-          <div style={{ marginTop: 16, background: "var(--card-bg)", borderRadius: 6, border: "1px solid var(--border)", overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
-            <div style={{ background: EQ.navy, padding: "8px 14px" }}>
+          <div style={{ marginTop: 16, background: "var(--card-bg)", borderRadius: "var(--radius)", border: "1px solid var(--border)", overflow: "hidden", boxShadow: "var(--shadow)" }}>
+            <div style={{ background: "var(--card-header-bg)", padding: "8px 14px" }}>
               <span style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Risk Tier Reference</span>
             </div>
             <div style={{ padding: "12px 14px" }}>
@@ -986,8 +986,8 @@ export default function App() {
               ? "1fr 44px 48px 32px 56px"
               : "1fr 48px 32px 56px";
             return (
-              <div style={{ marginTop: 16, background: "var(--card-bg)", borderRadius: 6, border: "1px solid var(--border)", overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
-                <div style={{ background: EQ.navy, padding: "8px 14px" }}>
+              <div style={{ marginTop: 16, background: "var(--card-bg)", borderRadius: "var(--radius)", border: "1px solid var(--border)", overflow: "hidden", boxShadow: "var(--shadow)" }}>
+                <div style={{ background: "var(--card-header-bg)", padding: "8px 14px" }}>
                   <span style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Score Breakdown</span>
                 </div>
                 <div style={{ padding: "10px 14px 6px" }}>
@@ -1030,7 +1030,7 @@ export default function App() {
                     </div>
                   ))}
                   {/* Total row */}
-                  <div style={{ display: "grid", gridTemplateColumns: cols, gap: 3, paddingTop: 6, marginTop: 3, borderTop: "2px solid var(--text-nav)" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: cols, gap: 3, paddingTop: 6, marginTop: 3, borderTop: "1px solid var(--border-dark)" }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-nav)" }}>Total</span>
                     <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-nav)", textAlign: "right", fontFamily: "monospace" }}>
                       {(scoringContribs.filter(f => f.isOn).reduce((s, f) => s + f.weight, 0) * 100).toFixed(0)}%
@@ -1054,8 +1054,8 @@ export default function App() {
         <div>
 
           {/* ── Fund Details Card ── */}
-          <div style={{ background: "var(--card-bg)", borderRadius: 6, border: "1px solid var(--border)", marginBottom: 16, overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
-            <div style={{ background: EQ.navy, padding: "8px 16px", display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ background: "var(--card-bg)", borderRadius: "var(--radius)", border: "1px solid var(--border)", marginBottom: 16, overflow: "hidden", boxShadow: "var(--shadow)" }}>
+            <div style={{ background: "var(--card-header-bg)", padding: "8px 16px", display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 13 }}>🏢</span>
               <span style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Fund Details</span>
             </div>
@@ -1075,7 +1075,7 @@ export default function App() {
                       fontSize: 13,
                       fontFamily: "inherit",
                       border: "1px solid var(--border)",
-                      borderRadius: 5,
+                      borderRadius: "var(--radius)",
                       background: "var(--input-bg)",
                       color: "var(--text-nav)",
                       outline: "none",
@@ -1089,7 +1089,7 @@ export default function App() {
                 {/* Fund Type */}
                 <div>
                   <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }}>Fund Type</div>
-                  <div style={{ display: "flex", gap: 0, border: "1px solid var(--border)", borderRadius: 5, overflow: "hidden" }}>
+                  <div style={{ display: "flex", gap: 0, border: "1px solid var(--border)", borderRadius: "var(--radius)", overflow: "hidden" }}>
                     {["Equity", "Debt", "Hybrid"].map((type, i) => {
                       const isActive = fundType === type;
                       return (
@@ -1120,7 +1120,7 @@ export default function App() {
 
               {/* Hybrid slider */}
               {fundType === "Hybrid" && (
-                <div style={{ marginTop: 14, padding: "12px 14px", background: "var(--input-bg)", borderRadius: 5, border: "1px solid var(--border)" }}>
+                <div style={{ marginTop: 14, padding: "12px 14px", background: "var(--input-bg)", borderRadius: "var(--radius)", border: "1px solid var(--border)" }}>
                   <div style={{ fontSize: 10, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 10 }}>
                     Equity / Debt Component Split
                   </div>
@@ -1140,30 +1140,12 @@ export default function App() {
                           appearance: "none",
                           WebkitAppearance: "none",
                           background: `linear-gradient(to right, ${EQ.navy} ${hybridSplit}%, #dde0ea ${hybridSplit}%)`,
-                          borderRadius: 3,
+                          borderRadius: "var(--radius-xs)",
                           outline: "none",
                           cursor: "pointer",
                         }}
                       />
-                      <style>{`
-                        input[type=range]::-webkit-slider-thumb {
-                          -webkit-appearance: none;
-                          width: 18px; height: 18px;
-                          border-radius: 50%;
-                          background: ${EQ.navy};
-                          border: 2px solid #fff;
-                          box-shadow: 0 1px 4px rgba(46,58,85,.35);
-                          cursor: pointer;
-                        }
-                        input[type=range]::-moz-range-thumb {
-                          width: 18px; height: 18px;
-                          border-radius: 50%;
-                          background: ${EQ.navy};
-                          border: 2px solid #fff;
-                          box-shadow: 0 1px 4px rgba(46,58,85,.35);
-                          cursor: pointer;
-                        }
-                      `}</style>
+                      
                     </div>
                     <span style={{ fontSize: 13, fontWeight: 800, color: EQ.gold, whiteSpace: "nowrap", minWidth: 52, textAlign: "right" }}>
                       {100 - hybridSplit}% Debt
@@ -1219,7 +1201,7 @@ export default function App() {
             };
 
             return (
-              <div style={{ background: "var(--card-bg)", borderRadius: 6, border: "1px solid var(--border)", marginBottom: 16, overflow: "hidden", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
+              <div style={{ background: "var(--card-bg)", borderRadius: "var(--radius)", border: "1px solid var(--border)", marginBottom: 16, overflow: "hidden", boxShadow: "var(--shadow)" }}>
                 {/* Header */}
                 <div style={{ background: "var(--card-bg)", borderBottom: "1px solid var(--border)", padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1227,17 +1209,17 @@ export default function App() {
                     <span style={{ fontSize: 16, fontWeight: 700, color: "var(--text-nav)" }}>Risk Factor Configuration</span>
                   </div>
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <button onClick={expandAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: "1px solid var(--border-dark)", borderRadius: 4, background: "var(--card-bg)", color: "var(--text-nav)" }}>
+                    <button onClick={expandAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: "1px solid var(--border-dark)", borderRadius: "var(--radius-sm)", background: "var(--card-bg)", color: "var(--text-nav)" }}>
                       Expand All
                     </button>
-                    <button onClick={collapseAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: "1px solid var(--border-dark)", borderRadius: 4, background: "var(--card-bg)", color: "var(--text-nav)" }}>
+                    <button onClick={collapseAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: "1px solid var(--border-dark)", borderRadius: "var(--radius-sm)", background: "var(--card-bg)", color: "var(--text-nav)" }}>
                       Collapse All
                     </button>
                     <div style={{ width: 1, height: 20, background: "var(--border)" }} />
-                    <button onClick={enableAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: "1px solid var(--tier1-color)", borderRadius: 4, background: "var(--card-bg)", color: "var(--tier1-color)" }}>
+                    <button onClick={enableAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: "1px solid var(--tier1-color)", borderRadius: "var(--radius-sm)", background: "var(--card-bg)", color: "var(--tier1-color)" }}>
                       Enable All
                     </button>
-                    <button onClick={disableAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: "1px solid var(--tier5-color)", borderRadius: 4, background: "var(--card-bg)", color: "var(--tier5-color)" }}>
+                    <button onClick={disableAll} style={{ padding: "5px 14px", fontSize: 11, fontWeight: 600, fontFamily: "inherit", cursor: "pointer", border: "1px solid var(--tier5-color)", borderRadius: "var(--radius-sm)", background: "var(--card-bg)", color: "var(--tier5-color)" }}>
                       Disable All
                     </button>
                   </div>
@@ -1310,16 +1292,16 @@ export default function App() {
           })()}
 
           {/* Section label bar */}
-          <div style={{ background: EQ.navy, borderRadius: "6px 6px 0 0", padding: "9px 16px", marginBottom: 0 }}>
+          <div style={{ background: "var(--card-header-bg)", borderRadius: "var(--radius) var(--radius) 0 0", padding: "9px 16px", marginBottom: 0 }}>
             <span style={{ fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>
               Factor Scoring — 1 (Low Risk) to 5 (High Risk)
             </span>
           </div>
 
-          <div style={{ border: "1px solid var(--border)", borderTop: "none", borderRadius: "0 0 6px 6px", background: "var(--card-bg)", padding: "16px", boxShadow: "0 1px 4px rgba(46,58,85,.07)" }}>
+          <div style={{ border: "1px solid var(--border)", borderTop: "none", borderRadius: "0 0 var(--radius) var(--radius)", background: "var(--card-bg)", padding: "16px", boxShadow: "var(--shadow)" }}>
 
             {disabledCount > 0 && (
-              <div style={{ marginBottom: 12, padding: "8px 12px", background: "var(--gold-light)", border: `1px solid ${EQ.gold}55`, borderRadius: 4, fontSize: 11, color: "#6b5000", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ marginBottom: 12, padding: "8px 12px", background: "var(--gold-light)", border: "1px solid var(--accent-dim)", borderRadius: "var(--radius-sm)", fontSize: 11, color: "#6b5000", display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: 13 }}>⚠</span>
                 <span>
                   <strong>{disabledCount} factor{disabledCount > 1 ? "s" : ""} excluded.</strong>{" "}
@@ -1342,7 +1324,7 @@ export default function App() {
                   key={f.name}
                   style={{
                     border: `1px solid ${!f.isOn && reasonMissing ? "#c05000" : "var(--border)"}`,
-                    borderRadius: 5,
+                    borderRadius: "var(--radius)",
                     marginBottom: 8,
                     overflow: "hidden",
                     background: f.isOn ? "var(--card-bg)" : "var(--disabled-bg)",
@@ -1377,8 +1359,8 @@ export default function App() {
 
                     {/* Contribution bar */}
                     <div style={{ width: 80 }}>
-                      <div style={{ position: "relative", height: 5, background: "var(--input-bg)", borderRadius: 3 }}>
-                        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${barPct}%`, background: f.isOn ? EQ.gold : "#c8ccd8", borderRadius: 3, transition: "width .25s ease" }} />
+                      <div style={{ position: "relative", height: 5, background: "var(--input-bg)", borderRadius: "var(--radius-xs)" }}>
+                        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${barPct}%`, background: f.isOn ? "var(--accent)" : "var(--border-dark)", borderRadius: "var(--radius-xs)", transition: "width .25s ease" }} />
                       </div>
                       <div style={{ fontSize: 9, color: f.isOn && !f.isComplete ? "#c05000" : EQ.textMuted, marginTop: 2, fontFamily: "sans-serif", textAlign: "right" }}>
                         {f.isOn && f.isComplete ? f.contrib.toFixed(3) : f.isOn && !f.isComplete ? "incomplete" : "—"}
@@ -1410,7 +1392,7 @@ export default function App() {
                                 const isSelected = f.score === v;
                                 return (
                                   <button key={v} onClick={() => setScores(prev => ({ ...prev, [f.name]: v }))}
-                                    style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: 4, background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-muted)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
+                                    style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: "var(--radius-sm)", background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-muted)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
                                     {v} — {tc.label}
                                   </button>
                                 );
@@ -1429,7 +1411,7 @@ export default function App() {
                                 const isSelected = f.debtScore === v;
                                 return (
                                   <button key={v} onClick={() => setDebtScores(prev => ({ ...prev, [f.name]: v }))}
-                                    style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: 4, background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-muted)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
+                                    style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: "var(--radius-sm)", background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-muted)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
                                     {v} — {tc.label}
                                   </button>
                                 );
@@ -1444,7 +1426,7 @@ export default function App() {
                             const isSelected = f.score === v;
                             return (
                               <button key={v} onClick={() => setScores(prev => ({ ...prev, [f.name]: v }))}
-                                style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: 4, background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-muted)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
+                                style={{ flex: 1, minWidth: 60, padding: "5px 4px", fontSize: 11, fontFamily: "sans-serif", cursor: "pointer", border: isSelected ? `2px solid ${tc.color}` : "1px solid var(--border)", borderRadius: "var(--radius-sm)", background: isSelected ? tc.bg : "var(--card-bg)", color: isSelected ? tc.color : "var(--text-muted)", fontWeight: isSelected ? 700 : 400, transition: "all .15s ease", whiteSpace: "nowrap", textAlign: "center" }}>
                                 {v} — {tc.label}
                               </button>
                             );
@@ -1471,7 +1453,7 @@ export default function App() {
                           fontSize: 11,
                           fontFamily: "inherit",
                           border: "1px solid var(--border)",
-                          borderRadius: 4,
+                          borderRadius: "var(--radius-sm)",
                           background: "var(--card-bg)",
                           color: "var(--text-nav)",
                           resize: "vertical",
@@ -1500,7 +1482,7 @@ export default function App() {
                           fontSize: 11,
                           fontFamily: "inherit",
                           border: "1px solid var(--border)",
-                          borderRadius: 4,
+                          borderRadius: "var(--radius-sm)",
                           background: "var(--card-bg)",
                           color: "var(--text-nav)",
                           marginBottom: 6,
@@ -1526,7 +1508,7 @@ export default function App() {
                           fontSize: 11,
                           fontFamily: "inherit",
                           border: `1px solid ${reasonMissing ? "#c05000" : reason.trim() ? "var(--tier1-color)" : "var(--border)"}`,
-                          borderRadius: 4,
+                          borderRadius: "var(--radius-sm)",
                           background: reasonMissing ? "var(--tier4-bg)" : "var(--card-bg)",
                           color: "var(--text)",
                           resize: "vertical",
@@ -1579,17 +1561,17 @@ export default function App() {
             })}
 
             {/* ── CRS Total ── */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: EQ.navy, borderRadius: 5, padding: "12px 16px", marginTop: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--card-header-bg)", borderRadius: "var(--radius)", padding: "12px 16px", marginTop: 8 }}>
               <div>
                 <span style={{ fontSize: 13, fontWeight: 700, color: EQ.gold, letterSpacing: ".04em" }}>Composite Risk Score (CRS)</span>
                 <span style={{ marginLeft: 10, fontSize: 10, color: "#c8ccd8", fontFamily: "sans-serif" }}>
                   {activeContribs.length} of {factors.length} factors active
                 </span>
               </div>
-              <span style={{ fontSize: 18, fontWeight: 800, color: tier.color, fontFamily: "sans-serif", background: tier.bg, padding: "2px 12px", borderRadius: 4 }}>{CRS.toFixed(3)}</span>
+              <span style={{ fontSize: 18, fontWeight: 800, color: tier.color, fontFamily: "sans-serif", background: tier.bg, padding: "2px 12px", borderRadius: "var(--radius-sm)" }}>{CRS.toFixed(3)}</span>
             </div>
 
-            <div style={{ marginTop: 12, padding: "11px 14px", background: "var(--input-bg)", borderRadius: 4, border: "1px solid var(--border)", fontSize: 11, color: "var(--text-muted)", lineHeight: 1.65 }}>
+            <div style={{ marginTop: 12, padding: "11px 14px", background: "var(--input-bg)", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", fontSize: 11, color: "var(--text-muted)", lineHeight: 1.65 }}>
               <strong style={{ color: "var(--text-nav)" }}>Regulatory Note:</strong> This KYP risk assessment is produced pursuant to NI 31-103 s.13.2, CIRO Rule 3800, and CSA Client Focused Reforms. Factor scores and weightings reflect internal methodology approved by the Investment Committee. CRS thresholds align with the approved product risk classification framework. This document is intended for registered adviser use only.
             </div>
           </div>
