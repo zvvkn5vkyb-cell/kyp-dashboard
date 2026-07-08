@@ -466,12 +466,32 @@ const HYBRID_SPECIFIC = {
 };
 
 // ---------------------------------------------------------------------------
-// Weights (fractions of 1.00). Category subtotals match the source document's
-// Weighting Summary Table exactly. Individual factor weights are calibrated so
-// that scoring each fund per Appendix A's qualitative ratings reproduces the
-// document's published CRS values (see funds.js for the scores themselves).
-// Two individual weights are taken directly from the document's text: the
-// Equity framework's Liquidity (14%) and Time Horizon (5%) factors.
+// METHODOLOGY NOTE — how these weights were derived (read before editing):
+//
+// The source document publishes CATEGORY-level weights only (the Weighting
+// Summary Table — e.g. Debt Structural/Inherent = 42%, Equity = 41%, Hybrid =
+// 35%). It does NOT publish individual factor-level weights, with exactly two
+// exceptions stated in prose: the Equity framework's Liquidity (14%) and Time
+// Horizon (5%) factors.
+//
+// Every other individual weight below is NOT a figure disclosed in the source
+// document. It was derived by this codebase via constrained least-squares
+// optimization (see scripts referenced in the project history / PR notes):
+// solve for a weight vector, per framework, that (a) sums to the document's
+// published category totals for every category, (b) honors the two
+// explicitly-published Equity weights above, and (c) reproduces the
+// document's published CRS to two decimal places when applied to the
+// Appendix-A-derived default scores in funds.js (EMFIT 2.56, ERIFT 2.91,
+// ERGFI 3.51 — the Equity vector must satisfy both ERIFT and ERGFI
+// simultaneously since they share one framework; ERIED 3.29 for Hybrid).
+// The system is underdetermined (more factors than constraints), so the
+// solution is one defensible calibration among many that satisfy the
+// document's disclosed constraints — not a unique or independently
+// re-derivable "true" weighting. Treat these as a modeling assumption that
+// reproduces the published outputs, not as source-document fact, and
+// disclose that distinction to anyone relying on this dashboard's factor-
+// level weight breakdown (the in-app Score Breakdown panel and the printed
+// report both carry a corresponding disclosure).
 // ---------------------------------------------------------------------------
 const DEBT_WEIGHTS = {
   PriceDiscovery: 0.13, Liquidity: 0.13, TimeHorizon: 0.06, VaR: 0.10,
@@ -674,3 +694,15 @@ export const EXCLUSION_REASONS = {
     "No active development or construction exposure exists in the current portfolio; factor is not applicable at this time.",
   ],
 };
+
+// User-facing disclosure of the weight-derivation methodology above — shown
+// in-app (Score Breakdown panel) and reused in the printed report so neither
+// surface implies factor-level weights were individually published by the
+// source document.
+export const WEIGHT_METHODOLOGY_NOTE =
+  "Category-level weights above are taken directly from the source document's Weighting Summary Table. " +
+  "The source document does not publish individual factor-level weights, with two stated exceptions " +
+  "(the Equity framework's Liquidity at 14% and Time Horizon at 5%). All other individual factor weights " +
+  "shown here were derived by this dashboard — via constrained optimization — to satisfy those published " +
+  "category totals while reproducing the document's published CRS values for each fund. They are a " +
+  "defensible calibration, not verbatim source-document figures.";

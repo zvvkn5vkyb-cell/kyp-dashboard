@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { FRAMEWORKS, CATEGORIES, EXCLUSION_REASONS, TIER_BOUNDARIES } from "./data/frameworks";
+import { FRAMEWORKS, CATEGORIES, EXCLUSION_REASONS, TIER_BOUNDARIES, WEIGHT_METHODOLOGY_NOTE } from "./data/frameworks";
 import { FUNDS, NAMING_NOTE, getFund } from "./data/funds";
 
 // Equiton brand palette
@@ -282,27 +282,40 @@ export default function App() {
     const hasScore = scores[f.name] != null;
     const canContribute = isOn && hasScore;
     const effectiveWeight = canContribute && activeWeightSum > 0 ? f.weight / activeWeightSum : 0;
+    // Flags an analyst override so it's visually distinguishable from the
+    // document-sourced default score (excluded factors already get their own
+    // "excluded" treatment, so this only fires for an enabled, edited score).
+    const isEdited = isOn && scores[f.name] !== fund.defaultScores[f.name];
 
     return {
       ...f,
       isOn,
       isComplete: hasScore,
+      isEdited,
       score: scores[f.name],
       effectiveWeight,
       contrib: canContribute ? scores[f.name] * effectiveWeight : 0,
     };
-  }), [scores, enabled, activeWeightSum, factors]);
+  }), [scores, enabled, activeWeightSum, factors, fund]);
 
   const CRS     = useMemo(() => contribs.reduce((s, f) => s + f.contrib, 0), [contribs]);
   const activeContribs = useMemo(() => contribs.filter(f => f.isOn), [contribs]);
   const maxC    = useMemo(() => Math.max(...activeContribs.map(f => f.contrib), 0.001), [activeContribs]);
-  const matchesDocument = Math.abs(CRS - fund.crs) < 0.005;
+  // Whether every factor is still at the fund's document-sourced default score
+  // and enabled — a direct per-factor comparison, not a CRS-proximity guess,
+  // so a single edited score (however small its weight) always registers as
+  // "edited" rather than being masked by floating-point closeness in the CRS.
+  const isDefaultState = useMemo(
+    () => factors.every(f => enabled[f.name] === true && scores[f.name] === fund.defaultScores[f.name]),
+    [factors, enabled, scores, fund]
+  );
   // At the fund's document-default scores, use its authoritative stated rating
   // (the source document's own numeric tier-boundary table does not always
   // agree with the narrative rating it assigns — see NAMING_NOTE-adjacent
-  // discrepancy for EMFIT/ERIED/ERGFI). Once scores are edited away from the
-  // default, fall back to the published boundary table.
-  const tier    = matchesDocument ? tierFromLabel(fund.tierLabel) : getTier(CRS);
+  // discrepancy for EMFIT/ERIED/ERGFI). The instant any score is edited or a
+  // factor is disabled, fall back to the published boundary table so an
+  // edited assessment can never keep displaying the unedited document rating.
+  const tier    = isDefaultState ? tierFromLabel(fund.tierLabel) : getTier(CRS);
   const top5    = [...activeContribs].sort((a, b) => b.contrib - a.contrib).slice(0, 5);
   const disabledCount = factors.length - activeContribs.length;
   const today   = new Date().toLocaleDateString("en-CA", { year: "numeric", month: "long", day: "numeric" });
@@ -551,6 +564,16 @@ export default function App() {
   CRS = Σ (Score<sub>i</sub> × EffectiveWeight<sub>i</sub>) across all active factors.
   When factors are excluded, remaining weights are scaled proportionally so the CRS remains on the 1–5 scale.
   Active factors: ${activeContribs.length} / ${factors.length}. &nbsp; Report generated: ${new Date().toLocaleString("en-CA")}.
+  <br/><br/>
+  <strong style="color:#2e3a55;">Weight Provenance:</strong>
+  ${fund.code}'s default scores and its published Composite Risk Score of ${fund.crs.toFixed(2)} (${fund.tierLabel}) are
+  reproduced directly from the source summary document. Category-level weights shown above are also taken directly
+  from that document's Weighting Summary Table. The source document does not itself publish individual factor-level
+  weights, with two stated exceptions (the Equity framework's Liquidity at 14% and Time Horizon at 5%). All other
+  individual factor weights in this model were derived — via constrained optimization — to satisfy the document's
+  published category totals while reproducing its published CRS outputs for each fund; they are a defensible
+  calibration used to operationalize the document's methodology, not verbatim source-document figures.
+  ${!isDefaultState ? `<br/><br/><strong style="color:#c05000;">Note:</strong> one or more scores on this report have been edited by the analyst away from the source document's default values; the CRS and tier shown reflect those edits and will not equal the published ${fund.crs.toFixed(2)} (${fund.tierLabel}) reference above.` : ""}
 </div>
 
 </body>
@@ -681,8 +704,8 @@ export default function App() {
               <div style={{ fontSize: 15, fontWeight: 700, color: tier.color }}>{tier.label}</div>
               <div style={{ fontSize: 11, color: tier.color, opacity: 0.8, marginTop: 2 }}>CRS: {CRS.toFixed(2)} / 5.00</div>
             </div>
-            <div style={{ marginTop: 8, fontSize: 10, color: matchesDocument ? "var(--tier1-color)" : "var(--tier4-color)", textAlign: "center" }}>
-              {matchesDocument ? "✓ Matches source-document CRS" : `Source document: ${fund.crs.toFixed(2)} — ${fund.tierLabel}`}
+            <div style={{ marginTop: 8, fontSize: 10, color: isDefaultState ? "var(--tier1-color)" : "var(--tier4-color)", textAlign: "center" }}>
+              {isDefaultState ? "✓ Default scores — matches source-document CRS" : `Edited — source document: ${fund.crs.toFixed(2)} — ${fund.tierLabel}`}
             </div>
           </div>
 
@@ -730,6 +753,9 @@ export default function App() {
                   <span style={{ fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: "#ffffff", fontWeight: 700 }}>Score Breakdown</span>
                 </div>
                 <div style={{ padding: "10px 14px 6px" }}>
+                  <div title={WEIGHT_METHODOLOGY_NOTE} style={{ fontSize: 9, color: "var(--text-muted)", fontStyle: "italic", marginBottom: 6, lineHeight: 1.4, cursor: "help" }}>
+                    ⓘ Category weights are from the source document; individual factor weights below were derived to satisfy those category totals and reproduce the document's published CRS (hover for detail).
+                  </div>
                   {weightsNormalized && (
                     <div style={{ fontSize: 9, color: "var(--text-muted)", fontStyle: "italic", marginBottom: 6, lineHeight: 1.4 }}>
                       Base Wt = model weight. Eff. Wt = renormalized across active factors only (sums to 100%). Weighted score uses Eff. Wt.
@@ -754,8 +780,8 @@ export default function App() {
                             {f.isOn && f.isComplete ? (f.effectiveWeight * 100).toFixed(1) + "%" : "—"}
                           </span>
                         )}
-                        <span style={{ fontSize: 13, fontWeight: 700, color: f.isOn ? EQ.gold : "var(--text-muted)", textAlign: "right", fontFamily: "monospace" }}>
-                          {f.isOn && f.score != null ? f.score : "—"}
+                        <span title={f.isEdited ? `Analyst-edited (document default: ${fund.defaultScores[f.name]})` : undefined} style={{ fontSize: 13, fontWeight: 700, color: f.isOn ? EQ.gold : "var(--text-muted)", textAlign: "right", fontFamily: "monospace" }}>
+                          {f.isOn && f.score != null ? f.score : "—"}{f.isEdited ? "*" : ""}
                         </span>
                         <span style={{ fontSize: 12, fontWeight: 600, color: f.isOn && !f.isComplete ? "var(--tier4-color)" : "var(--text-nav)", textAlign: "right", fontFamily: "monospace" }}>
                           {f.isOn && f.isComplete ? f.contrib.toFixed(3) : f.isOn && !f.isComplete ? "N/A" : "—"}
@@ -775,6 +801,11 @@ export default function App() {
                     <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-nav)", textAlign: "right", fontFamily: "monospace" }}>—</span>
                     <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-nav)", textAlign: "right", fontFamily: "monospace" }}>{CRS.toFixed(3)}</span>
                   </div>
+                  {!isDefaultState && (
+                    <div style={{ marginTop: 6, fontSize: 9, color: EQ.gold, fontStyle: "italic" }}>
+                      * analyst-edited from the document default score
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -866,9 +897,11 @@ export default function App() {
                 ))}
               </div>
 
-              <div style={{ marginTop: 10, fontSize: 10, color: "var(--text-muted)", lineHeight: 1.5, fontStyle: "italic" }}>
-                ⓘ {NAMING_NOTE}
-              </div>
+              {fund.altCodes.length > 0 && (
+                <div style={{ marginTop: 10, fontSize: 10, color: "var(--text-muted)", lineHeight: 1.5, fontStyle: "italic" }}>
+                  ⓘ {NAMING_NOTE}
+                </div>
+              )}
             </div>
           </div>
 
@@ -1040,6 +1073,11 @@ export default function App() {
                     <div style={{ display: "flex", alignItems: "baseline", gap: 7 }}>
                       <span style={{ fontSize: 10, color: f.isOn ? EQ.gold : EQ.textMuted, fontWeight: 800 }}>#{idx + 1}</span>
                       <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text-nav)" }}>{f.displayName}</span>
+                      {f.isEdited && (
+                        <span title={`Analyst-edited — document default is ${fund.defaultScores[f.name]}`} style={{ fontSize: 9, fontWeight: 700, color: EQ.gold, background: "var(--gold-light)", border: `1px solid ${EQ.gold}55`, borderRadius: "var(--radius-xs)", padding: "1px 6px", textTransform: "uppercase", letterSpacing: ".04em" }}>
+                          Edited
+                        </span>
+                      )}
                     </div>
 
                     {/* Weight display */}
